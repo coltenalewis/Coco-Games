@@ -4,6 +4,8 @@ import "./globals.css";
 import Providers from "@/components/Providers";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import FloatingParticles from "@/components/FloatingParticles";
+import MouseGlow from "@/components/MouseGlow";
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
@@ -30,7 +32,9 @@ export default function RootLayout({
     <html lang="en">
       <body className={`${geistSans.variable} font-sans antialiased`}>
         <Providers>
-          <div className="flex flex-col min-h-screen">
+          <FloatingParticles />
+          <MouseGlow />
+          <div className="flex flex-col min-h-screen relative z-10">
             <Navbar />
             <main className="flex-1">{children}</main>
             <Footer />

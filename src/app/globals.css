@@ -12,7 +12,9 @@ body {
   background: var(--background);
 }
 
-/* Sharp button style */
+/* ==============================
+   BUTTONS & CARDS
+   ============================== */
 @layer components {
   .btn-primary {
     @apply px-6 py-3 bg-coco-accent text-white font-bold
@@ -44,13 +46,14 @@ body {
   }
 }
 
-/* Animated background dots */
+/* ==============================
+   BACKGROUND PATTERNS
+   ============================== */
 .bg-dots {
   background-image: radial-gradient(circle, rgba(232, 148, 74, 0.15) 1px, transparent 1px);
   background-size: 24px 24px;
 }
 
-/* Diagonal stripes accent */
 .bg-stripes {
   background-image: repeating-linear-gradient(
     -45deg,
@@ -61,7 +64,9 @@ body {
   );
 }
 
-/* Text gradient */
+/* ==============================
+   TEXT EFFECTS
+   ============================== */
 .text-gradient {
   background: linear-gradient(135deg, #F5B041 0%, #E8944A 50%, #D35400 100%);
   -webkit-background-clip: text;
@@ -73,4 +78,247 @@ body {
   .text-balance {
     text-wrap: balance;
   }
+}
+
+/* ==============================
+   HOLOGRAPHIC / SHIMMER EFFECTS
+   ============================== */
+
+/* Holographic shimmer - use on cards or badges */
+.holo-shimmer {
+  position: relative;
+  overflow: hidden;
+}
+.holo-shimmer::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    105deg,
+    transparent 20%,
+    rgba(232, 148, 74, 0.06) 30%,
+    rgba(245, 176, 65, 0.12) 40%,
+    rgba(211, 84, 0, 0.06) 50%,
+    transparent 60%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 4s ease-in-out infinite;
+  pointer-events: none;
+}
+
+/* Holographic border glow */
+.holo-border {
+  position: relative;
+}
+.holo-border::before {
+  content: "";
+  position: absolute;
+  inset: -2px;
+  z-index: -1;
+  background: linear-gradient(
+    90deg,
+    #E8944A,
+    #F5B041,
+    #D35400,
+    #E8944A,
+    #F5B041
+  );
+  background-size: 300% 100%;
+  animation: holo-rotate 6s linear infinite;
+  opacity: 0.5;
+}
+
+/* Rainbow holographic text */
+.holo-text {
+  background: linear-gradient(
+    90deg,
+    #F5B041 0%,
+    #E8944A 25%,
+    #D35400 50%,
+    #E8944A 75%,
+    #F5B041 100%
+  );
+  background-size: 200% auto;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  animation: holo-rotate 4s linear infinite;
+}
+
+@keyframes shimmer {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+@keyframes holo-rotate {
+  0% { background-position: 0% center; }
+  100% { background-position: 300% center; }
+}
+
+/* ==============================
+   FLOATING PARTICLES
+   ============================== */
+.particle {
+  position: absolute;
+  border-radius: 50%;
+  opacity: 0;
+  animation: float-up linear infinite;
+}
+
+.particle-1 {
+  width: 6px; height: 6px;
+  background: rgba(232, 148, 74, 0.25);
+  left: 10%;
+  animation-duration: 18s;
+  animation-delay: 0s;
+}
+.particle-2 {
+  width: 4px; height: 4px;
+  background: rgba(245, 176, 65, 0.2);
+  left: 25%;
+  animation-duration: 22s;
+  animation-delay: 3s;
+}
+.particle-3 {
+  width: 8px; height: 8px;
+  background: rgba(211, 84, 0, 0.15);
+  left: 45%;
+  animation-duration: 20s;
+  animation-delay: 6s;
+}
+.particle-4 {
+  width: 5px; height: 5px;
+  background: rgba(232, 148, 74, 0.2);
+  left: 65%;
+  animation-duration: 24s;
+  animation-delay: 2s;
+}
+.particle-5 {
+  width: 3px; height: 3px;
+  background: rgba(245, 176, 65, 0.25);
+  left: 80%;
+  animation-duration: 19s;
+  animation-delay: 8s;
+}
+.particle-6 {
+  width: 7px; height: 7px;
+  background: rgba(232, 148, 74, 0.12);
+  left: 35%;
+  animation-duration: 25s;
+  animation-delay: 4s;
+}
+.particle-7 {
+  width: 4px; height: 4px;
+  background: rgba(211, 84, 0, 0.18);
+  left: 55%;
+  animation-duration: 21s;
+  animation-delay: 10s;
+}
+.particle-8 {
+  width: 6px; height: 6px;
+  background: rgba(245, 176, 65, 0.15);
+  left: 90%;
+  animation-duration: 23s;
+  animation-delay: 1s;
+}
+
+@keyframes float-up {
+  0% {
+    transform: translateY(100vh) translateX(0px) scale(0);
+    opacity: 0;
+  }
+  10% {
+    opacity: 1;
+  }
+  90% {
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(-100px) translateX(40px) scale(1);
+    opacity: 0;
+  }
+}
+
+/* ==============================
+   MOUSE GLOW
+   ============================== */
+body:hover .hover-glow-visible {
+  opacity: 1;
+}
+
+/* ==============================
+   ACTIVE NAV INDICATOR
+   ============================== */
+.nav-link-active {
+  color: #F5B041 !important;
+  border-color: rgba(232, 148, 74, 0.5) !important;
+  background: rgba(232, 148, 74, 0.08);
+}
+.nav-link-active::after {
+  content: "";
+  position: absolute;
+  bottom: -2px;
+  left: 25%;
+  right: 25%;
+  height: 2px;
+  background: #E8944A;
+}
+
+/* ==============================
+   ANIMATED GRADIENT BACKGROUND
+   ============================== */
+.bg-animated-gradient {
+  background: linear-gradient(
+    -45deg,
+    #1A0F08,
+    #3D2B1A,
+    #2a1a0d,
+    #1A0F08
+  );
+  background-size: 400% 400%;
+  animation: gradient-shift 15s ease infinite;
+}
+
+@keyframes gradient-shift {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+/* ==============================
+   CARD HOVER GLOW
+   ============================== */
+.card-glow {
+  position: relative;
+}
+.card-glow::before {
+  content: "";
+  position: absolute;
+  inset: -1px;
+  z-index: -1;
+  background: linear-gradient(135deg, rgba(232,148,74,0) 0%, rgba(232,148,74,0.3) 50%, rgba(232,148,74,0) 100%);
+  background-size: 200% 200%;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+.card-glow:hover::before {
+  opacity: 1;
+  animation: shimmer 2s ease-in-out infinite;
+}
+
+/* ==============================
+   PULSE RING (for status indicators)
+   ============================== */
+@keyframes pulse-ring {
+  0% {
+    transform: scale(1);
+    opacity: 0.6;
+  }
+  100% {
+    transform: scale(1.8);
+    opacity: 0;
+  }
+}
+.pulse-ring {
+  animation: pulse-ring 2s ease-out infinite;
 }

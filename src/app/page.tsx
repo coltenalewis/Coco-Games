@@ -1,13 +1,34 @@
 import Image from "next/image";
 import Link from "next/link";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth";
+import { getSupabase } from "@/lib/supabase";
+import ConnectionStatus from "@/components/ConnectionStatus";
 
-export default function Home() {
+export default async function Home() {
+  const session = await getServerSession(authOptions);
+
+  let robloxLinked = false;
+  if (session?.user?.discordId) {
+    const { data } = await getSupabase()
+      .from("users")
+      .select("roblox_id")
+      .eq("discord_id", session.user.discordId)
+      .maybeSingle();
+    robloxLinked = !!data?.roblox_id;
+  }
+
   return (
     <>
       {/* Hero */}
-      <section className="relative overflow-hidden bg-coco-hero min-h-[85vh] flex items-center">
+      <section className="relative overflow-hidden bg-animated-gradient min-h-[85vh] flex items-center">
         {/* Dot pattern overlay */}
         <div className="absolute inset-0 bg-dots opacity-40" />
+
+        {/* Moving gradient orbs */}
+        <div className="absolute top-1/4 left-1/4 w-[500px] h-[500px] bg-coco-accent/5 rounded-full blur-[100px] animate-[gradient-shift_20s_ease_infinite]" />
+        <div className="absolute bottom-1/4 right-1/4 w-[400px] h-[400px] bg-coco-gold/5 rounded-full blur-[80px] animate-[gradient-shift_15s_ease_infinite_reverse]" />
+        <div className="absolute top-1/2 left-1/2 w-[300px] h-[300px] bg-coco-ember/5 rounded-full blur-[60px] animate-[gradient-shift_25s_ease_infinite]" />
 
         {/* Geometric accent shapes */}
         <div className="absolute top-0 right-0 w-96 h-96 bg-coco-accent/10 -rotate-12 translate-x-32 -translate-y-16" />
@@ -19,13 +40,13 @@ export default function Home() {
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
             {/* Left: Text */}
             <div>
-              <div className="inline-block px-4 py-1.5 bg-coco-accent/20 border-2 border-coco-accent/40 text-coco-gold text-xs font-bold uppercase tracking-widest mb-6">
+              <div className="inline-block px-4 py-1.5 bg-coco-accent/20 border-2 border-coco-accent/40 text-coco-gold text-xs font-bold uppercase tracking-widest mb-6 holo-shimmer">
                 Game Studio
               </div>
               <h1 className="text-5xl sm:text-7xl font-black text-coco-cream leading-[0.95] mb-6">
                 COCO
                 <br />
-                <span className="text-gradient">GAMES</span>
+                <span className="holo-text text-7xl sm:text-8xl">GAMES</span>
               </h1>
               <p className="text-lg text-coco-cream/60 mb-10 max-w-md leading-relaxed">
                 A community-driven studio crafting fun, immersive experiences.
@@ -35,7 +56,7 @@ export default function Home() {
               <div className="flex flex-col sm:flex-row gap-4">
                 <a
                   href="/api/auth/signin"
-                  className="btn-discord inline-flex items-center justify-center gap-3 text-base"
+                  className="btn-discord inline-flex items-center justify-center gap-3 text-base holo-shimmer"
                 >
                   <svg
                     width="22"
@@ -48,12 +69,20 @@ export default function Home() {
                   Connect with Discord
                 </a>
               </div>
+
+              {/* Connection Status Indicators */}
+              <ConnectionStatus
+                isLoggedIn={!!session}
+                discordName={session?.user?.name || null}
+                robloxLinked={robloxLinked}
+              />
             </div>
 
             {/* Right: Logo */}
             <div className="flex justify-center lg:justify-end">
               <div className="relative">
-                <div className="absolute inset-0 bg-coco-accent/20 blur-3xl scale-110" />
+                <div className="absolute inset-0 bg-coco-accent/20 blur-3xl scale-110 animate-[gradient-shift_8s_ease_infinite]" />
+                <div className="absolute inset-[-20px] bg-coco-gold/10 blur-2xl scale-105 animate-[gradient-shift_12s_ease_infinite_reverse]" />
                 <Image
                   src="/CocoGamesLogo.png"
                   alt="COCO GAMES Logo"
@@ -82,7 +111,7 @@ export default function Home() {
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {/* Card 1 */}
-            <div className="card-interactive p-8 group">
+            <div className="card-interactive p-8 group holo-shimmer card-glow">
               <div className="w-14 h-14 bg-coco-accent/15 border-2 border-coco-accent/30 flex items-center justify-center mb-5 group-hover:bg-coco-accent/25 transition-colors">
                 <svg
                   className="w-7 h-7 text-coco-ember"
@@ -108,7 +137,7 @@ export default function Home() {
             </div>
 
             {/* Card 2 */}
-            <div className="card-interactive p-8 group">
+            <div className="card-interactive p-8 group holo-shimmer card-glow">
               <div className="w-14 h-14 bg-coco-accent/15 border-2 border-coco-accent/30 flex items-center justify-center mb-5 group-hover:bg-coco-accent/25 transition-colors">
                 <svg
                   className="w-7 h-7 text-coco-ember"
@@ -134,7 +163,7 @@ export default function Home() {
             </div>
 
             {/* Card 3 */}
-            <div className="card-interactive p-8 group">
+            <div className="card-interactive p-8 group holo-shimmer card-glow">
               <div className="w-14 h-14 bg-coco-accent/15 border-2 border-coco-accent/30 flex items-center justify-center mb-5 group-hover:bg-coco-accent/25 transition-colors">
                 <svg
                   className="w-7 h-7 text-coco-ember"
@@ -163,8 +192,12 @@ export default function Home() {
       </section>
 
       {/* Support / Tickets */}
-      <section className="bg-coco-dark border-y-2 border-coco-accent/20 py-16">
-        <div className="max-w-5xl mx-auto px-4">
+      <section className="bg-coco-dark border-y-2 border-coco-accent/20 py-16 relative overflow-hidden">
+        {/* Subtle moving background for dark section */}
+        <div className="absolute inset-0 bg-animated-gradient opacity-50" />
+        <div className="absolute inset-0 bg-dots opacity-20" />
+
+        <div className="relative max-w-5xl mx-auto px-4">
           <div className="text-center mb-10">
             <span className="text-coco-accent font-bold text-xs uppercase tracking-[0.2em]">
               Support
@@ -208,7 +241,7 @@ export default function Home() {
               <Link
                 key={item.category}
                 href={`/tickets/new?category=${item.category}`}
-                className="group p-5 border-2 border-coco-accent/15 bg-coco-midnight/50 hover:border-coco-accent/40 hover:bg-coco-midnight/80 transition-all"
+                className="group p-5 border-2 border-coco-accent/15 bg-coco-midnight/50 hover:border-coco-accent/40 hover:bg-coco-midnight/80 transition-all holo-shimmer card-glow"
               >
                 <div className="w-10 h-10 bg-coco-accent/15 border border-coco-accent/30 flex items-center justify-center mb-3 group-hover:bg-coco-accent/25 transition-colors">
                   <svg
@@ -257,7 +290,7 @@ export default function Home() {
           </div>
           <a
             href="/api/auth/signin"
-            className="btn-primary whitespace-nowrap"
+            className="btn-primary whitespace-nowrap holo-shimmer"
           >
             Get Started
           </a>
