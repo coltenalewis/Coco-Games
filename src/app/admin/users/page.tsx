@@ -3,7 +3,6 @@
 import { useState, useEffect, useCallback } from "react";
 import { useSession } from "next-auth/react";
 import Link from "next/link";
-export const runtime = 'edge';
 
 interface UserResult {
   id: string;

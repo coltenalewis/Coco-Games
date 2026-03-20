@@ -5,7 +5,6 @@ import { useParams } from "next/navigation";
 import { useSession } from "next-auth/react";
 import Link from "next/link";
 import TicketChat from "@/components/TicketChat";
-export const runtime = 'edge';
 
 interface TicketDetail {
   id: string;

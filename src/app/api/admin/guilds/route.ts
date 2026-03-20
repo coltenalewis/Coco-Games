@@ -3,7 +3,6 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { hasMinRole } from "@/lib/roles";
 import { getBotGuilds } from "@/lib/discord";
-export const runtime = 'edge';
 
 // GET /api/admin/guilds - list all guilds the bot is in
 export async function GET() {

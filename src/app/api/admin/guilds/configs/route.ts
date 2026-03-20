@@ -3,7 +3,6 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { hasMinRole } from "@/lib/roles";
 import { getSupabase } from "@/lib/supabase";
-export const runtime = 'edge';
 
 // GET /api/admin/guilds/configs - get all guild configurations
 export async function GET() {

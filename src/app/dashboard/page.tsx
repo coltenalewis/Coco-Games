@@ -3,7 +3,6 @@ import { authOptions } from "@/lib/auth";
 import { redirect } from "next/navigation";
 import { getBotGuilds, generateBotInviteUrl } from "@/lib/discord";
 import ServerCard from "@/components/ServerCard";
-export const runtime = 'edge';
 
 export const metadata = {
   title: "Dashboard | COCO GAMES",

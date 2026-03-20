@@ -3,7 +3,6 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { getSupabase } from "@/lib/supabase";
 import { isStaff } from "@/lib/roles";
-export const runtime = 'edge';
 
 // GET /api/tickets/[id]/messages
 export async function GET(
