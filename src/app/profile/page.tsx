@@ -1,3 +1,4 @@
+import { Suspense } from "react";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { redirect } from "next/navigation";
@@ -118,10 +119,12 @@ export default async function ProfilePage() {
           </div>
 
           {/* Roblox */}
-          <RobloxLinker
-            currentRobloxId={userData?.roblox_id || null}
-            currentRobloxUsername={userData?.roblox_username || null}
-          />
+          <Suspense fallback={<div className="p-4 bg-coco-light border-2 border-dashed border-coco-accent/40 animate-pulse h-16" />}>
+            <RobloxLinker
+              currentRobloxId={userData?.roblox_id || null}
+              currentRobloxUsername={userData?.roblox_username || null}
+            />
+          </Suspense>
         </div>
       </div>
 
