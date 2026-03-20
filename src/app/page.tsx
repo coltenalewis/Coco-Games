@@ -4,6 +4,7 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { getSupabase } from "@/lib/supabase";
 import ConnectionStatus from "@/components/ConnectionStatus";
+import GameShowcase from "@/components/GameShowcase";
 
 export default async function Home() {
   const session = await getServerSession(authOptions);
@@ -97,99 +98,25 @@ export default async function Home() {
         </div>
       </section>
 
-      {/* What We Do */}
-      <section className="bg-coco-light py-24 bg-stripes relative">
-        <div className="max-w-6xl mx-auto px-4">
-          <div className="text-center mb-16">
-            <span className="text-coco-accent font-bold text-xs uppercase tracking-[0.2em]">
-              What We Do
-            </span>
-            <h2 className="text-4xl font-black text-coco-dark mt-3">
-              Built for <span className="text-gradient">Gamers</span>
-            </h2>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {/* Card 1 */}
-            <div className="card-interactive p-8 group holo-shimmer card-glow">
-              <div className="w-14 h-14 bg-coco-accent/15 border-2 border-coco-accent/30 flex items-center justify-center mb-5 group-hover:bg-coco-accent/25 transition-colors">
-                <svg
-                  className="w-7 h-7 text-coco-ember"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="square"
-                    strokeLinejoin="miter"
-                    strokeWidth={2}
-                    d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"
-                  />
-                </svg>
-              </div>
-              <h3 className="font-bold text-lg text-coco-dark mb-2">
-                Community First
-              </h3>
-              <p className="text-coco-coffee text-sm leading-relaxed">
-                Join our Discord to connect with players, share feedback, and
-                shape the games we build together.
-              </p>
-            </div>
-
-            {/* Card 2 */}
-            <div className="card-interactive p-8 group holo-shimmer card-glow">
-              <div className="w-14 h-14 bg-coco-accent/15 border-2 border-coco-accent/30 flex items-center justify-center mb-5 group-hover:bg-coco-accent/25 transition-colors">
-                <svg
-                  className="w-7 h-7 text-coco-ember"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="square"
-                    strokeLinejoin="miter"
-                    strokeWidth={2}
-                    d="M11 4a2 2 0 114 0v1a1 1 0 001 1h3a1 1 0 011 1v3a1 1 0 01-1 1h-1a2 2 0 100 4h1a1 1 0 011 1v3a1 1 0 01-1 1h-3a1 1 0 01-1-1v-1a2 2 0 10-4 0v1a1 1 0 01-1 1H7a1 1 0 01-1-1v-3a1 1 0 00-1-1H4a2 2 0 110-4h1a1 1 0 001-1V7a1 1 0 011-1h3a1 1 0 001-1V4z"
-                  />
-                </svg>
-              </div>
-              <h3 className="font-bold text-lg text-coco-dark mb-2">
-                Immersive Games
-              </h3>
-              <p className="text-coco-coffee text-sm leading-relaxed">
-                Engaging games across platforms including Roblox, with a focus on
-                fun, replayable experiences.
-              </p>
-            </div>
-
-            {/* Card 3 */}
-            <div className="card-interactive p-8 group holo-shimmer card-glow">
-              <div className="w-14 h-14 bg-coco-accent/15 border-2 border-coco-accent/30 flex items-center justify-center mb-5 group-hover:bg-coco-accent/25 transition-colors">
-                <svg
-                  className="w-7 h-7 text-coco-ember"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="square"
-                    strokeLinejoin="miter"
-                    strokeWidth={2}
-                    d="M13 10V3L4 14h7v7l9-11h-7z"
-                  />
-                </svg>
-              </div>
-              <h3 className="font-bold text-lg text-coco-dark mb-2">
-                Events & Updates
-              </h3>
-              <p className="text-coco-coffee text-sm leading-relaxed">
-                Game launches, seasonal events, and exclusive rewards for our
-                community members.
-              </p>
-            </div>
-          </div>
+      {/* Studio Intro */}
+      <section className="bg-coco-light py-16 bg-stripes relative">
+        <div className="max-w-3xl mx-auto px-4 text-center">
+          <span className="text-coco-accent font-bold text-xs uppercase tracking-[0.2em]">
+            Our Studio
+          </span>
+          <h2 className="text-4xl font-black text-coco-dark mt-3">
+            Exciting & <span className="text-gradient">Upcoming</span> Games
+          </h2>
+          <p className="text-coco-coffee text-sm leading-relaxed mt-4 max-w-xl mx-auto">
+            We&apos;re a game studio building new, exciting experiences on Roblox.
+            From strategy to adventure, every title is crafted with our community in mind.
+            Stay tuned for what&apos;s next.
+          </p>
         </div>
       </section>
+
+      {/* Featured Game */}
+      <GameShowcase />
 
       {/* Support / Tickets */}
       <section className="bg-coco-dark border-y-2 border-coco-accent/20 py-16 relative overflow-hidden">

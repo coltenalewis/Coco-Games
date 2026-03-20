@@ -64,7 +64,7 @@ export async function PATCH(req: NextRequest) {
     );
   }
 
-  const validRoles = ["owner", "admin", "mod", "user"];
+  const validRoles = ["owner", "executive", "admin", "mod", "user"];
   if (!validRoles.includes(role)) {
     return NextResponse.json({ error: "Invalid role" }, { status: 400 });
   }
@@ -104,7 +104,7 @@ export async function PATCH(req: NextRequest) {
         try {
           // Handle admin role
           if (config.admin_role_id) {
-            if (role === "admin" || role === "owner") {
+            if (role === "admin" || role === "executive" || role === "owner") {
               await addGuildMemberRole(config.guild_id, discordId, config.admin_role_id);
             } else {
               await removeGuildMemberRole(config.guild_id, discordId, config.admin_role_id);
@@ -113,7 +113,7 @@ export async function PATCH(req: NextRequest) {
 
           // Handle moderator role
           if (config.moderator_role_id) {
-            if (role === "mod" || role === "admin" || role === "owner") {
+            if (role === "mod" || role === "admin" || role === "executive" || role === "owner") {
               await addGuildMemberRole(config.guild_id, discordId, config.moderator_role_id);
             } else {
               await removeGuildMemberRole(config.guild_id, discordId, config.moderator_role_id);

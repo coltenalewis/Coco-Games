@@ -10,7 +10,7 @@ export interface Database {
           roblox_id: string | null;
           roblox_username: string | null;
           is_owner: boolean;
-          role: "owner" | "admin" | "mod" | "user";
+          role: "owner" | "executive" | "admin" | "mod" | "user";
           created_at: string;
           updated_at: string;
         };
@@ -22,7 +22,7 @@ export interface Database {
           roblox_id?: string | null;
           roblox_username?: string | null;
           is_owner?: boolean;
-          role?: "owner" | "admin" | "mod" | "user";
+          role?: "owner" | "executive" | "admin" | "mod" | "user";
           created_at?: string;
           updated_at?: string;
         };
@@ -34,7 +34,7 @@ export interface Database {
           roblox_id?: string | null;
           roblox_username?: string | null;
           is_owner?: boolean;
-          role?: "owner" | "admin" | "mod" | "user";
+          role?: "owner" | "executive" | "admin" | "mod" | "user";
           updated_at?: string;
         };
       };
@@ -184,6 +184,82 @@ export interface Database {
         Update: {
           content?: string;
           guild_ids?: string[];
+        };
+      };
+      accounting_transactions: {
+        Row: {
+          id: string;
+          type: "income" | "expense";
+          category: string;
+          description: string;
+          amount: number;
+          date: string;
+          reference: string | null;
+          notes: string | null;
+          created_by: string;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          type: "income" | "expense";
+          category: string;
+          description: string;
+          amount: number;
+          date: string;
+          reference?: string | null;
+          notes?: string | null;
+          created_by: string;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: {
+          type?: "income" | "expense";
+          category?: string;
+          description?: string;
+          amount?: number;
+          date?: string;
+          reference?: string | null;
+          notes?: string | null;
+          updated_at?: string;
+        };
+      };
+      documents: {
+        Row: {
+          id: string;
+          type: "contract" | "invoice" | "letter" | "memo";
+          title: string;
+          content: string;
+          status: "draft" | "final";
+          created_by: string;
+          recipient_name: string | null;
+          recipient_title: string | null;
+          effective_date: string | null;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          type: "contract" | "invoice" | "letter" | "memo";
+          title: string;
+          content: string;
+          status?: "draft" | "final";
+          created_by: string;
+          recipient_name?: string | null;
+          recipient_title?: string | null;
+          effective_date?: string | null;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: {
+          type?: "contract" | "invoice" | "letter" | "memo";
+          title?: string;
+          content?: string;
+          status?: "draft" | "final";
+          recipient_name?: string | null;
+          recipient_title?: string | null;
+          effective_date?: string | null;
+          updated_at?: string;
         };
       };
     };

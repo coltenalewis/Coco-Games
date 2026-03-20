@@ -22,6 +22,7 @@ interface TicketChatProps {
 
 const roleBadge: Record<string, string> = {
   owner: "bg-coco-ember text-white",
+  executive: "bg-green-100 text-green-700",
   admin: "bg-red-100 text-red-700",
   mod: "bg-blue-100 text-blue-700",
   user: "",

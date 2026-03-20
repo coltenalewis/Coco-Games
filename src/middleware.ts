@@ -23,12 +23,22 @@ export async function middleware(request: NextRequest) {
     }
   }
 
-  // Protect /admin - requires admin or owner
+  // Protect /admin - requires admin or higher
   if (pathname.startsWith("/admin")) {
     if (!token) {
       return NextResponse.redirect(new URL("/", request.url));
     }
-    if (token.role !== "owner" && token.role !== "admin") {
+    if (token.role !== "owner" && token.role !== "executive" && token.role !== "admin") {
+      return NextResponse.redirect(new URL("/profile", request.url));
+    }
+  }
+
+  // Protect /accounting - requires executive or owner
+  if (pathname.startsWith("/accounting")) {
+    if (!token) {
+      return NextResponse.redirect(new URL("/", request.url));
+    }
+    if (token.role !== "owner" && token.role !== "executive") {
       return NextResponse.redirect(new URL("/profile", request.url));
     }
   }
@@ -48,6 +58,7 @@ export const config = {
     "/profile/:path*",
     "/dashboard/:path*",
     "/admin/:path*",
+    "/accounting/:path*",
     "/tickets/:path*",
   ],
 };

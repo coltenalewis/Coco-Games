@@ -12,6 +12,7 @@ export default function Navbar() {
   const pathname = usePathname();
   const role = session?.user?.role;
   const isAdmin = hasMinRole(role, "admin");
+  const isExecutive = hasMinRole(role, "executive");
   const isOwner = role === "owner";
 
   const isActive = (path: string) => {
@@ -75,6 +76,21 @@ export default function Navbar() {
                     Admin
                     {isActive("/admin") && (
                       <span className="absolute bottom-0 left-1/4 right-1/4 h-0.5 bg-coco-ember" />
+                    )}
+                  </Link>
+                )}
+                {isExecutive && (
+                  <Link
+                    href="/accounting"
+                    className={`relative text-sm font-bold px-3 py-1.5 border transition-all ${
+                      isActive("/accounting")
+                        ? "text-coco-gold border-coco-gold/50 bg-green-900/30"
+                        : "text-green-400 border-green-500/30 hover:text-coco-gold hover:border-coco-gold/50 bg-green-900/10"
+                    }`}
+                  >
+                    Accounting
+                    {isActive("/accounting") && (
+                      <span className="absolute bottom-0 left-1/4 right-1/4 h-0.5 bg-green-400" />
                     )}
                   </Link>
                 )}

@@ -1,7 +1,8 @@
-export type UserRole = "owner" | "admin" | "mod" | "user";
+export type UserRole = "owner" | "executive" | "admin" | "mod" | "user";
 
 const ROLE_HIERARCHY: Record<UserRole, number> = {
-  owner: 3,
+  owner: 4,
+  executive: 3,
   admin: 2,
   mod: 1,
   user: 0,

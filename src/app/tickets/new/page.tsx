@@ -14,7 +14,7 @@ function NewTicketForm() {
   const [category, setCategory] = useState(
     validCategories.includes(initialCategory) ? initialCategory : "question"
   );
-  const [priority, setPriority] = useState("normal");
+  const [priority] = useState("normal");
   const [message, setMessage] = useState("");
   const [imageUrl, setImageUrl] = useState<string | null>(null);
   const [uploading, setUploading] = useState(false);
@@ -142,29 +142,6 @@ function NewTicketForm() {
                   {cat.icon}
                 </span>
                 {cat.label}
-              </button>
-            ))}
-          </div>
-        </div>
-
-        {/* Priority */}
-        <div>
-          <label className="block text-xs font-bold text-coco-coffee uppercase tracking-wider mb-1.5">
-            Priority
-          </label>
-          <div className="flex gap-2">
-            {["low", "normal", "high", "urgent"].map((p) => (
-              <button
-                key={p}
-                type="button"
-                onClick={() => setPriority(p)}
-                className={`px-3 py-1.5 text-xs font-bold uppercase border-2 transition-all ${
-                  priority === p
-                    ? "bg-coco-dark text-coco-gold border-coco-dark"
-                    : "bg-white text-coco-dark border-coco-dark/15 hover:border-coco-accent"
-                }`}
-              >
-                {p}
               </button>
             ))}
           </div>
