@@ -4,6 +4,7 @@ import { redirect } from "next/navigation";
 import { getUserGuilds, getBotGuilds, getGuildIconUrl } from "@/lib/discord";
 import { getSupabase } from "@/lib/supabase";
 import RobloxLinker from "./RobloxLinker";
+export const runtime = 'edge';
 
 export const metadata = {
   title: "Profile | COCO GAMES",

@@ -3,6 +3,7 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { getSupabase } from "@/lib/supabase";
 import { hasMinRole } from "@/lib/roles";
+export const runtime = 'edge';
 
 export async function GET(
   _req: NextRequest,

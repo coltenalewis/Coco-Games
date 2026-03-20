@@ -9,6 +9,7 @@ import {
 } from "@/lib/discord";
 import Link from "next/link";
 import ServerConfigForm from "./ServerConfigForm";
+export const runtime = 'edge';
 
 export const metadata = {
   title: "Server Config | COCO GAMES",

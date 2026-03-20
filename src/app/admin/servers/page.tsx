@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
+export const runtime = 'edge';
 
 interface Guild {
   id: string;

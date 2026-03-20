@@ -3,6 +3,7 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { getSupabase } from "@/lib/supabase";
 import { randomUUID } from "crypto";
+export const runtime = 'edge';
 
 const ALLOWED_TYPES = [
   "image/jpeg",

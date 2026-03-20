@@ -4,6 +4,7 @@ import { authOptions } from "@/lib/auth";
 import { getSupabase } from "@/lib/supabase";
 import { hasMinRole } from "@/lib/roles";
 import {
+export const runtime = 'edge';
   getBotGuilds,
   getOrCreateWebhook,
   sendWebhookMessage,

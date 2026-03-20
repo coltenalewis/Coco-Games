@@ -2,6 +2,7 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { getSupabase } from "@/lib/supabase";
 import { getBotGuilds } from "@/lib/discord";
+export const runtime = 'edge';
 
 export const metadata = {
   title: "Admin Panel | COCO GAMES",

@@ -3,6 +3,7 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { getSupabase } from "@/lib/supabase";
 import { assignVerifiedRole } from "@/lib/verification";
+export const runtime = 'edge';
 
 async function fetchRobloxUsername(robloxId: string): Promise<string | null> {
   try {
