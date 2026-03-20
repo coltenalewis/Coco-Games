@@ -3,21 +3,70 @@
 @tailwind utilities;
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+  --background: #FFFAF5;
+  --foreground: #3D2B1A;
 }
 
 body {
   color: var(--foreground);
   background: var(--background);
-  font-family: Arial, Helvetica, sans-serif;
+}
+
+/* Sharp button style */
+@layer components {
+  .btn-primary {
+    @apply px-6 py-3 bg-coco-accent text-white font-bold
+           border-2 border-coco-dark shadow-coco-sharp
+           hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none
+           active:translate-x-[4px] active:translate-y-[4px]
+           transition-all duration-150 ease-out;
+  }
+
+  .btn-discord {
+    @apply px-6 py-3 bg-[#5865F2] text-white font-bold
+           border-2 border-[#3a42a8] shadow-[4px_4px_0px_#3a42a8]
+           hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none
+           active:translate-x-[4px] active:translate-y-[4px]
+           transition-all duration-150 ease-out;
+  }
+
+  .card {
+    @apply bg-coco-card border-2 border-coco-dark/10
+           shadow-coco transition-all duration-200;
+  }
+
+  .card-interactive {
+    @apply bg-coco-card border-2 border-coco-brown/20
+           shadow-coco-sharp-sm
+           hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-none
+           hover:border-coco-accent
+           transition-all duration-150 ease-out;
+  }
+}
+
+/* Animated background dots */
+.bg-dots {
+  background-image: radial-gradient(circle, rgba(232, 148, 74, 0.15) 1px, transparent 1px);
+  background-size: 24px 24px;
+}
+
+/* Diagonal stripes accent */
+.bg-stripes {
+  background-image: repeating-linear-gradient(
+    -45deg,
+    transparent,
+    transparent 8px,
+    rgba(232, 148, 74, 0.06) 8px,
+    rgba(232, 148, 74, 0.06) 16px
+  );
+}
+
+/* Text gradient */
+.text-gradient {
+  background: linear-gradient(135deg, #F5B041 0%, #E8944A 50%, #D35400 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
 }
 
 @layer utilities {

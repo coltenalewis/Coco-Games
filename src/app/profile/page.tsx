@@ -1,0 +1,161 @@
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth";
+import { redirect } from "next/navigation";
+import { getUserGuilds, getBotGuilds, getGuildIconUrl } from "@/lib/discord";
+import { getSupabase } from "@/lib/supabase";
+import RobloxLinker from "./RobloxLinker";
+
+export const metadata = {
+  title: "Profile | COCO GAMES",
+};
+
+export default async function ProfilePage() {
+  const session = await getServerSession(authOptions);
+
+  if (!session) {
+    redirect("/");
+  }
+
+  // Fetch user data from Supabase
+  const { data: userData } = await getSupabase()
+    .from("users")
+    .select("roblox_id, roblox_username")
+    .eq("discord_id", session.user?.discordId || "")
+    .maybeSingle();
+
+  let mutualGuilds: { id: string; name: string; icon: string | null }[] = [];
+
+  try {
+    if (session.accessToken) {
+      const [userGuilds, botGuilds] = await Promise.all([
+        getUserGuilds(session.accessToken),
+        getBotGuilds(),
+      ]);
+      const botGuildIds = new Set(botGuilds.map((g) => g.id));
+      mutualGuilds = userGuilds.filter((g) => botGuildIds.has(g.id));
+    }
+  } catch {
+    // Silently handle if Discord API fails
+  }
+
+  const isVerified = !!userData?.roblox_id;
+
+  return (
+    <div className="max-w-3xl mx-auto px-4 py-12">
+      {/* Verification Banner */}
+      {!isVerified && (
+        <div className="bg-coco-accent/10 border-2 border-coco-accent p-5 mb-6 flex items-start gap-4">
+          <span className="text-2xl">&#9888;&#65039;</span>
+          <div>
+            <p className="font-bold text-coco-dark text-sm">
+              Account Not Verified
+            </p>
+            <p className="text-coco-coffee text-sm mt-1">
+              Connect your Roblox account below to get the <strong>Verified</strong> role
+              in all COCO GAMES servers.
+            </p>
+          </div>
+        </div>
+      )}
+
+      {isVerified && (
+        <div className="bg-green-50 border-2 border-green-400 p-5 mb-6 flex items-start gap-4">
+          <span className="text-2xl">&#9989;</span>
+          <div>
+            <p className="font-bold text-green-800 text-sm">
+              Verified
+            </p>
+            <p className="text-green-700 text-sm mt-1">
+              Both accounts are linked. You have the Verified role.
+            </p>
+          </div>
+        </div>
+      )}
+
+      {/* Profile Card */}
+      <div className="card p-8 mb-6">
+        <div className="flex items-center gap-6">
+          {session.user?.image && (
+            <img
+              src={session.user.image}
+              alt="Avatar"
+              className="w-20 h-20 border-4 border-coco-accent shadow-coco-sharp"
+            />
+          )}
+          <div>
+            <h1 className="text-2xl font-black text-coco-dark">
+              {session.user?.name}
+            </h1>
+            <p className="text-coco-coffee text-sm font-mono mt-1">
+              ID: {session.user?.discordId}
+            </p>
+          </div>
+        </div>
+      </div>
+
+      {/* Connected Accounts */}
+      <div className="card p-8 mb-6">
+        <h2 className="text-sm font-bold text-coco-accent uppercase tracking-widest mb-5">
+          Connected Accounts
+        </h2>
+        <div className="space-y-3">
+          {/* Discord - always connected */}
+          <div className="flex items-center justify-between p-4 bg-coco-light border-2 border-coco-dark/5">
+            <div className="flex items-center gap-3">
+              <div className="w-9 h-9 bg-[#5865F2] flex items-center justify-center">
+                <svg width="16" height="12" viewBox="0 0 71 55" fill="white">
+                  <path d="M60.1045 4.8978C55.5792 2.8214 50.7265 1.2916 45.6527 0.41542C45.5603 0.39851 45.468 0.440769 45.4204 0.525289C44.7963 1.6353 44.105 3.0834 43.6209 4.2216C38.1637 3.4046 32.7345 3.4046 27.3892 4.2216C26.905 3.0581 26.1886 1.6353 25.5617 0.525289C25.5141 0.443589 25.4218 0.40133 25.3294 0.41542C20.2584 1.2888 15.4057 2.8186 10.8776 4.8978C10.8384 4.9147 10.8048 4.9429 10.7825 4.9795C1.57795 18.7309-0.943561 32.1443 0.293408 45.3914C0.299005 45.4562 0.335386 45.5182 0.385761 45.5576C6.45866 50.0174 12.3413 52.7249 18.1147 54.5195C18.2071 54.5477 18.305 54.5139 18.3638 54.4378C19.7295 52.5728 20.9469 50.6063 21.9907 48.5383C22.0523 48.4172 21.9935 48.2735 21.8676 48.2256C19.9366 47.4931 18.0979 46.6 16.3292 45.5858C16.1893 45.5041 16.1781 45.304 16.3068 45.2082C16.679 44.9293 17.0513 44.6391 17.4067 44.3461C17.471 44.2926 17.5606 44.2813 17.6362 44.3151C29.2558 49.6202 41.8354 49.6202 53.3179 44.3151C53.3935 44.2785 53.4831 44.2898 53.5502 44.3433C53.9084 44.6363 54.2807 44.9293 54.6557 45.2082C54.7844 45.304 54.7759 45.5041 54.636 45.5858C52.8676 46.6197 51.0288 47.4931 49.0949 48.2228C48.969 48.2707 48.913 48.4172 48.9746 48.5383C50.0384 50.6034 51.2558 52.5699 52.5765 54.435C52.6324 54.5139 52.7331 54.5505 52.8256 54.5195C58.6268 52.7249 64.5094 50.0174 70.5823 45.5576C70.6355 45.5182 70.6691 45.459 70.6747 45.3942C72.0876 30.0791 68.1112 16.7757 60.1968 4.9823C60.1772 4.9429 60.1437 4.9147 60.1045 4.8978ZM23.7259 37.3253C20.2276 37.3253 17.3451 34.1136 17.3451 30.1693C17.3451 26.225 20.1717 23.0133 23.7259 23.0133C27.308 23.0133 30.1626 26.2532 30.1066 30.1693C30.1066 34.1136 27.28 37.3253 23.7259 37.3253ZM47.3178 37.3253C43.8196 37.3253 40.937 34.1136 40.937 30.1693C40.937 26.225 43.7636 23.0133 47.3178 23.0133C50.8999 23.0133 53.7545 26.2532 53.6985 30.1693C53.6985 34.1136 50.8999 37.3253 47.3178 37.3253Z" />
+                </svg>
+              </div>
+              <div>
+                <p className="font-bold text-coco-dark text-sm">Discord</p>
+                <p className="text-xs text-coco-coffee">{session.user?.name}</p>
+              </div>
+            </div>
+            <span className="text-xs text-green-700 font-bold bg-green-100 border border-green-300 px-2.5 py-1">
+              Connected
+            </span>
+          </div>
+
+          {/* Roblox */}
+          <RobloxLinker
+            currentRobloxId={userData?.roblox_id || null}
+            currentRobloxUsername={userData?.roblox_username || null}
+          />
+        </div>
+      </div>
+
+      {/* Mutual Servers */}
+      {mutualGuilds.length > 0 && (
+        <div className="card p-8">
+          <h2 className="text-sm font-bold text-coco-accent uppercase tracking-widest mb-5">
+            Your COCO GAMES Servers
+          </h2>
+          <div className="space-y-2">
+            {mutualGuilds.map((guild) => (
+              <div
+                key={guild.id}
+                className="flex items-center gap-3 p-3 bg-coco-light border-2 border-coco-dark/5"
+              >
+                {guild.icon ? (
+                  <img
+                    src={getGuildIconUrl(guild.id, guild.icon)!}
+                    alt={guild.name}
+                    className="w-8 h-8 border border-coco-accent/30"
+                  />
+                ) : (
+                  <div className="w-8 h-8 bg-coco-dark flex items-center justify-center text-coco-gold text-xs font-bold">
+                    {guild.name.charAt(0)}
+                  </div>
+                )}
+                <span className="font-bold text-coco-dark text-sm">
+                  {guild.name}
+                </span>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
