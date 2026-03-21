@@ -95,14 +95,15 @@ body {
   inset: 0;
   background: linear-gradient(
     105deg,
-    transparent 20%,
-    rgba(232, 148, 74, 0.06) 30%,
-    rgba(245, 176, 65, 0.12) 40%,
-    rgba(211, 84, 0, 0.06) 50%,
-    transparent 60%
+    transparent 15%,
+    rgba(232, 148, 74, 0.1) 25%,
+    rgba(245, 176, 65, 0.2) 35%,
+    rgba(211, 84, 0, 0.15) 45%,
+    rgba(245, 176, 65, 0.08) 55%,
+    transparent 65%
   );
   background-size: 200% 100%;
-  animation: shimmer 4s ease-in-out infinite;
+  animation: shimmer 3s ease-in-out infinite;
   pointer-events: none;
 }
 
@@ -124,8 +125,8 @@ body {
     #F5B041
   );
   background-size: 300% 100%;
-  animation: holo-rotate 6s linear infinite;
-  opacity: 0.5;
+  animation: holo-rotate 4s linear infinite;
+  opacity: 0.7;
 }
 
 /* Rainbow holographic text */
@@ -133,16 +134,18 @@ body {
   background: linear-gradient(
     90deg,
     #F5B041 0%,
-    #E8944A 25%,
+    #ffcc66 15%,
+    #E8944A 30%,
     #D35400 50%,
-    #E8944A 75%,
+    #E8944A 70%,
+    #ffcc66 85%,
     #F5B041 100%
   );
-  background-size: 200% auto;
+  background-size: 300% auto;
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
-  animation: holo-rotate 4s linear infinite;
+  animation: holo-rotate 3s linear infinite;
 }
 
 @keyframes shimmer {
@@ -321,4 +324,54 @@ body:hover .hover-glow-visible {
 }
 .pulse-ring {
   animation: pulse-ring 2s ease-out infinite;
+}
+
+/* ==============================
+   MOBILE PERFORMANCE & SMOOTHING
+   ============================== */
+
+/* GPU acceleration for animated elements */
+.bg-animated-gradient,
+.holo-shimmer::after,
+.holo-text,
+.particle,
+.card-glow::before {
+  will-change: background-position;
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
+}
+
+/* Smoother gradient animation on mobile */
+@media (max-width: 768px) {
+  .bg-animated-gradient {
+    background-size: 300% 300%;
+    animation: gradient-shift 20s ease infinite;
+  }
+
+  /* Reduce particle count on mobile for perf */
+  .particle-5, .particle-6, .particle-7, .particle-8 {
+    display: none;
+  }
+
+  /* Slower, smoother shimmer on mobile */
+  .holo-shimmer::after {
+    animation: shimmer 5s ease-in-out infinite;
+  }
+
+  /* Smoother holo text */
+  .holo-text {
+    animation: holo-rotate 5s linear infinite;
+  }
+}
+
+/* Reduce motion for users who prefer it */
+@media (prefers-reduced-motion: reduce) {
+  .holo-shimmer::after,
+  .holo-text,
+  .bg-animated-gradient,
+  .particle,
+  .card-glow::before,
+  .pulse-ring {
+    animation: none !important;
+  }
 }

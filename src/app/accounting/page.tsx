@@ -65,26 +65,26 @@ export default async function AccountingOverview() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <h2 className="text-xl font-black text-coco-dark">Financial Overview</h2>
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+        <h2 className="text-lg sm:text-xl font-black text-coco-dark">Financial Overview</h2>
         <div className="flex gap-2">
-          <Link href="/accounting/transactions" className="btn-primary text-xs !px-4 !py-2">
+          <Link href="/accounting/transactions" className="btn-primary text-xs !px-3 sm:!px-4 !py-2 min-h-[40px] flex items-center">
             Add Transaction
           </Link>
-          <Link href="/accounting/documents/new" className="text-xs px-4 py-2 font-bold border-2 border-coco-dark/10 hover:border-green-400 text-coco-dark hover:text-green-700 transition-colors">
+          <Link href="/accounting/documents/new" className="text-xs px-3 sm:px-4 py-2 font-bold border-2 border-coco-dark/10 hover:border-green-400 text-coco-dark hover:text-green-700 transition-colors min-h-[40px] flex items-center">
             New Document
           </Link>
         </div>
       </div>
 
       {/* Stats Grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-2 sm:gap-4">
         {stats.map((stat) => (
-          <div key={stat.label} className={`p-5 border-2 ${stat.bg}`}>
-            <p className="text-xs font-bold uppercase tracking-wider text-coco-coffee/60">
+          <div key={stat.label} className={`p-3 sm:p-5 border-2 ${stat.bg}`}>
+            <p className="text-[10px] sm:text-xs font-bold uppercase tracking-wider text-coco-coffee/60">
               {stat.label}
             </p>
-            <p className={`text-2xl font-black mt-1 ${stat.color}`}>
+            <p className={`text-lg sm:text-2xl font-black mt-1 ${stat.color}`}>
               {stat.value}
             </p>
           </div>
@@ -106,7 +106,7 @@ export default async function AccountingOverview() {
         ) : (
           <div className="divide-y divide-coco-dark/5">
             {recent.map((tx) => (
-              <div key={tx.id} className="flex items-center justify-between px-5 py-3">
+              <div key={tx.id} className="flex items-center justify-between px-3 sm:px-5 py-3 gap-2">
                 <div className="flex items-center gap-3">
                   <div className={`w-2.5 h-2.5 rounded-full ${tx.type === "income" ? "bg-green-400" : "bg-red-400"}`} />
                   <div>

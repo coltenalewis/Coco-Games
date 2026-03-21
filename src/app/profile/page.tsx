@@ -42,10 +42,10 @@ export default async function ProfilePage() {
   const isVerified = !!userData?.roblox_id;
 
   return (
-    <div className="max-w-3xl mx-auto px-4 py-12">
+    <div className="max-w-3xl mx-auto px-3 sm:px-4 py-6 sm:py-12">
       {/* Verification Banner */}
       {!isVerified && (
-        <div className="bg-coco-accent/10 border-2 border-coco-accent p-5 mb-6 flex items-start gap-4">
+        <div className="bg-coco-accent/10 border-2 border-coco-accent p-3 sm:p-5 mb-4 sm:mb-6 flex items-start gap-3 sm:gap-4">
           <span className="text-2xl">&#9888;&#65039;</span>
           <div>
             <p className="font-bold text-coco-dark text-sm">
@@ -60,7 +60,7 @@ export default async function ProfilePage() {
       )}
 
       {isVerified && (
-        <div className="bg-green-50 border-2 border-green-400 p-5 mb-6 flex items-start gap-4">
+        <div className="bg-green-50 border-2 border-green-400 p-3 sm:p-5 mb-4 sm:mb-6 flex items-start gap-3 sm:gap-4">
           <span className="text-2xl">&#9989;</span>
           <div>
             <p className="font-bold text-green-800 text-sm">
@@ -74,20 +74,20 @@ export default async function ProfilePage() {
       )}
 
       {/* Profile Card */}
-      <div className="card p-8 mb-6">
-        <div className="flex items-center gap-6">
+      <div className="card p-4 sm:p-8 mb-4 sm:mb-6">
+        <div className="flex items-center gap-4 sm:gap-6">
           {session.user?.image && (
             <img
               src={session.user.image}
               alt="Avatar"
-              className="w-20 h-20 border-4 border-coco-accent shadow-coco-sharp"
+              className="w-14 h-14 sm:w-20 sm:h-20 border-2 sm:border-4 border-coco-accent shadow-coco-sharp flex-shrink-0"
             />
           )}
-          <div>
-            <h1 className="text-2xl font-black text-coco-dark">
+          <div className="min-w-0">
+            <h1 className="text-lg sm:text-2xl font-black text-coco-dark truncate">
               {session.user?.name}
             </h1>
-            <p className="text-coco-coffee text-sm font-mono mt-1">
+            <p className="text-coco-coffee text-xs sm:text-sm font-mono mt-1 truncate">
               ID: {session.user?.discordId}
             </p>
           </div>
@@ -95,8 +95,8 @@ export default async function ProfilePage() {
       </div>
 
       {/* Connected Accounts */}
-      <div className="card p-8 mb-6">
-        <h2 className="text-sm font-bold text-coco-accent uppercase tracking-widest mb-5">
+      <div className="card p-4 sm:p-8 mb-4 sm:mb-6">
+        <h2 className="text-xs sm:text-sm font-bold text-coco-accent uppercase tracking-widest mb-3 sm:mb-5">
           Connected Accounts
         </h2>
         <div className="space-y-3">
@@ -130,8 +130,8 @@ export default async function ProfilePage() {
 
       {/* Mutual Servers */}
       {mutualGuilds.length > 0 && (
-        <div className="card p-8">
-          <h2 className="text-sm font-bold text-coco-accent uppercase tracking-widest mb-5">
+        <div className="card p-4 sm:p-8">
+          <h2 className="text-xs sm:text-sm font-bold text-coco-accent uppercase tracking-widest mb-3 sm:mb-5">
             Your COCO GAMES Servers
           </h2>
           <div className="space-y-2">

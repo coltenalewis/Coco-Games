@@ -26,26 +26,26 @@ export default async function AdminLayout({
 
   return (
     <div className="min-h-screen bg-coco-light">
-      <div className="max-w-7xl mx-auto px-4 py-8">
+      <div className="max-w-7xl mx-auto px-3 sm:px-4 py-4 sm:py-8">
         {/* Header */}
-        <div className="mb-8">
+        <div className="mb-4 sm:mb-8">
           <span className="text-coco-ember font-bold text-xs uppercase tracking-[0.2em]">
             Administration
           </span>
-          <h1 className="text-3xl font-black text-coco-dark mt-1">
+          <h1 className="text-2xl sm:text-3xl font-black text-coco-dark mt-1">
             Admin Panel
           </h1>
         </div>
 
-        <div className="flex flex-col lg:flex-row gap-6">
-          {/* Sidebar */}
+        <div className="flex flex-col lg:flex-row gap-4 sm:gap-6">
+          {/* Sidebar - horizontal scroll on mobile */}
           <aside className="lg:w-56 flex-shrink-0">
-            <nav className="card p-2 space-y-1">
+            <nav className="card p-1.5 sm:p-2 flex lg:flex-col gap-1 overflow-x-auto lg:overflow-visible">
               {navItems.map((item) => (
                 <Link
                   key={item.href}
                   href={item.href}
-                  className="flex items-center gap-3 px-3 py-2.5 text-sm font-medium text-coco-dark hover:bg-coco-accent/10 hover:text-coco-accent transition-colors"
+                  className="flex items-center gap-2 sm:gap-3 px-3 py-2.5 text-xs sm:text-sm font-medium text-coco-dark hover:bg-coco-accent/10 hover:text-coco-accent transition-colors whitespace-nowrap min-h-[44px]"
                 >
                   <svg
                     className="w-5 h-5 flex-shrink-0"

@@ -4,54 +4,55 @@ import Image from "next/image";
 export default function Footer() {
   return (
     <footer className="bg-coco-midnight border-t-2 border-coco-accent/20 text-coco-cream/60">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-8">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-10">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 sm:gap-8">
           {/* Brand */}
           <div className="flex items-start gap-3">
             <Image
               src="/CocoGamesLogo.png"
               alt="COCO GAMES"
-              width={32}
-              height={32}
+              width={28}
+              height={28}
+              className="sm:w-8 sm:h-8"
             />
             <div>
-              <p className="text-coco-gold font-bold tracking-widest text-sm uppercase">
+              <p className="text-coco-gold font-bold tracking-widest text-xs sm:text-sm uppercase">
                 Coco Games
               </p>
-              <p className="text-xs mt-1 text-coco-cream/40">
+              <p className="text-[10px] sm:text-xs mt-1 text-coco-cream/40">
                 Crafting fun, one game at a time.
               </p>
             </div>
           </div>
 
           {/* Links */}
-          <div className="flex gap-8 text-sm">
+          <div className="flex gap-6 sm:gap-8 text-xs sm:text-sm">
             <div className="space-y-2">
-              <p className="text-coco-accent font-bold text-xs uppercase tracking-wider">
+              <p className="text-coco-accent font-bold text-[10px] sm:text-xs uppercase tracking-wider">
                 Legal
               </p>
               <Link
                 href="/terms"
-                className="block hover:text-coco-gold transition-colors"
+                className="block hover:text-coco-gold transition-colors min-h-[36px] flex items-center"
               >
                 Terms
               </Link>
               <Link
                 href="/privacy"
-                className="block hover:text-coco-gold transition-colors"
+                className="block hover:text-coco-gold transition-colors min-h-[36px] flex items-center"
               >
                 Privacy
               </Link>
             </div>
             <div className="space-y-2">
-              <p className="text-coco-accent font-bold text-xs uppercase tracking-wider">
+              <p className="text-coco-accent font-bold text-[10px] sm:text-xs uppercase tracking-wider">
                 Community
               </p>
               <a
                 href="https://discord.gg/"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="block hover:text-coco-gold transition-colors"
+                className="block hover:text-coco-gold transition-colors min-h-[36px] flex items-center"
               >
                 Discord
               </a>
@@ -60,7 +61,7 @@ export default function Footer() {
 
           {/* Copyright */}
           <div className="sm:text-right">
-            <p className="text-xs text-coco-cream/30">
+            <p className="text-[10px] sm:text-xs text-coco-cream/30">
               &copy; {new Date().getFullYear()} COCO GAMES
               <br />
               All rights reserved.

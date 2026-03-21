@@ -6,6 +6,9 @@ export default function MouseGlow() {
   const glowRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
+    // Disable on touch devices - no mouse cursor to follow
+    if ("ontouchstart" in window || navigator.maxTouchPoints > 0) return;
+
     const glow = glowRef.current;
     if (!glow) return;
 
@@ -21,7 +24,6 @@ export default function MouseGlow() {
     };
 
     const animate = () => {
-      // Smooth follow with lerp
       currentX += (x - currentX) * 0.15;
       currentY += (y - currentY) * 0.15;
       glow.style.transform = `translate(${currentX - 200}px, ${currentY - 200}px)`;
@@ -40,7 +42,7 @@ export default function MouseGlow() {
   return (
     <div
       ref={glowRef}
-      className="pointer-events-none fixed top-0 left-0 z-30 w-[400px] h-[400px] rounded-full opacity-0 hover-glow-visible transition-opacity duration-300"
+      className="pointer-events-none fixed top-0 left-0 z-30 w-[400px] h-[400px] rounded-full opacity-0 hover-glow-visible transition-opacity duration-300 hidden sm:block"
       style={{
         background:
           "radial-gradient(circle, rgba(232,148,74,0.08) 0%, rgba(245,176,65,0.04) 40%, transparent 70%)",
