@@ -24,7 +24,7 @@ export async function GET() {
   const state = randomBytes(16).toString("hex");
 
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || process.env.NEXTAUTH_URL || "http://localhost:3000";
-  const redirectUri = `${siteUrl}/api/roblox/callback`;
+  const redirectUri = `${siteUrl}/api/auth/callback/roblox`;
 
   const params = new URLSearchParams({
     client_id: clientId,

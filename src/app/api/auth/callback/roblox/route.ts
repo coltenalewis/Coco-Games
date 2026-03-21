@@ -39,7 +39,7 @@ export async function GET(req: NextRequest) {
     );
   }
 
-  const redirectUri = `${siteUrl}/api/roblox/callback`;
+  const redirectUri = `${siteUrl}/api/auth/callback/roblox`;
 
   // Exchange code for tokens
   const tokenRes = await fetch("https://apis.roblox.com/oauth/v1/token", {
