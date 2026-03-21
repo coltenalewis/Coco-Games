@@ -156,7 +156,7 @@ export default function GameShowcase() {
                   </h3>
                   <p className="text-coco-cream/50 text-[10px] sm:text-xs mt-0.5 sm:mt-1 line-clamp-2 sm:line-clamp-none max-w-md">
                     Command armies, claim territories, and rewrite history in this
-                    pixel-art strategy experience on Roblox.
+                    strategy experience on Roblox.
                   </p>
                 </div>
                 <div className="hidden sm:block text-right flex-shrink-0">

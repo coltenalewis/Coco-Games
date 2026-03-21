@@ -118,6 +118,75 @@ export default async function Home() {
       {/* Featured Game */}
       <GameShowcase />
 
+      {/* Leaderboards & Progress */}
+      <section className="bg-coco-light py-10 sm:py-16 bg-stripes relative">
+        <div className="max-w-5xl mx-auto px-3 sm:px-4">
+          <div className="text-center mb-6 sm:mb-10">
+            <span className="text-coco-accent font-bold text-xs uppercase tracking-[0.2em]">
+              Compete
+            </span>
+            <h2 className="text-2xl sm:text-3xl font-black text-coco-dark mt-2">
+              Leaderboards & <span className="text-gradient">Progress</span>
+            </h2>
+            <p className="text-coco-coffee/60 text-xs sm:text-sm mt-2 max-w-md mx-auto">
+              Track your stats, climb the ranks, and see how you stack up against the community.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+            {[
+              {
+                label: "Global Leaderboard",
+                desc: "See the top players across all games",
+                icon: "M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z",
+              },
+              {
+                label: "My Progress",
+                desc: "View your personal stats and achievements",
+                icon: "M16 8v8m-4-5v5m-4-2v2m-2 4h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z",
+              },
+              {
+                label: "Seasonal Rankings",
+                desc: "Compete in seasonal events for rewards",
+                icon: "M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z",
+              },
+              {
+                label: "Achievements",
+                desc: "Unlock badges and milestones",
+                icon: "M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z",
+              },
+            ].map((item) => (
+              <div
+                key={item.label}
+                className="relative card p-4 sm:p-6 opacity-75 cursor-not-allowed select-none group"
+              >
+                {/* Coming Soon overlay */}
+                <div className="absolute inset-0 z-10 flex items-center justify-center">
+                  <span className="text-[10px] sm:text-xs font-black uppercase tracking-widest text-coco-accent bg-coco-light/90 border-2 border-coco-accent/30 px-3 py-1.5 shadow-coco-sharp-sm">
+                    Coming Soon
+                  </span>
+                </div>
+
+                {/* Locked icon */}
+                <div className="w-10 h-10 sm:w-12 sm:h-12 bg-coco-dark/5 border-2 border-coco-dark/10 flex items-center justify-center mb-3 sm:mb-4">
+                  <svg
+                    className="w-5 h-5 sm:w-6 sm:h-6 text-coco-coffee/30"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                    strokeWidth={1.5}
+                  >
+                    <path strokeLinecap="round" strokeLinejoin="round" d={item.icon} />
+                  </svg>
+                </div>
+                <h3 className="font-bold text-coco-dark text-xs sm:text-sm mb-1">{item.label}</h3>
+                <p className="text-coco-coffee/40 text-[10px] sm:text-xs leading-relaxed">{item.desc}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
       {/* Support / Tickets */}
       <section className="bg-coco-dark border-y-2 border-coco-accent/20 py-10 sm:py-16 relative overflow-hidden">
         <div className="absolute inset-0 bg-animated-gradient opacity-50" />
