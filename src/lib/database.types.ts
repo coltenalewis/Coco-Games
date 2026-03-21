@@ -143,7 +143,7 @@ export interface Database {
           target_discord_id: string;
           guild_id: string | null;
           guild_name: string | null;
-          action_type: "ban" | "unban" | "kick" | "warn" | "note";
+          action_type: "ban" | "unban" | "kick" | "warn" | "note" | "timeout";
           reason: string | null;
           moderator_discord_id: string | null;
           moderator_username: string | null;
@@ -154,7 +154,7 @@ export interface Database {
           target_discord_id: string;
           guild_id?: string | null;
           guild_name?: string | null;
-          action_type: "ban" | "unban" | "kick" | "warn" | "note";
+          action_type: "ban" | "unban" | "kick" | "warn" | "note" | "timeout";
           reason?: string | null;
           moderator_discord_id?: string | null;
           moderator_username?: string | null;

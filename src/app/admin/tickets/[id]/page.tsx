@@ -10,6 +10,7 @@ interface TicketDetail {
   id: string;
   user_discord_id: string;
   subject: string;
+  category: string;
   status: string;
   priority: string;
   assigned_to: string | null;
@@ -33,6 +34,11 @@ export default function AdminTicketDetailPage() {
   const [ticket, setTicket] = useState<TicketDetail | null>(null);
   const [loading, setLoading] = useState(true);
   const [updating, setUpdating] = useState(false);
+
+  // Status change modal
+  const [showStatusModal, setShowStatusModal] = useState(false);
+  const [pendingStatus, setPendingStatus] = useState("");
+  const [closingMessage, setClosingMessage] = useState("");
 
   const fetchTicket = useCallback(async () => {
     try {
@@ -70,6 +76,22 @@ export default function AdminTicketDetailPage() {
     }
   };
 
+  const handleStatusChange = (newStatus: string) => {
+    setPendingStatus(newStatus);
+    setClosingMessage("");
+    setShowStatusModal(true);
+  };
+
+  const confirmStatusChange = async () => {
+    setShowStatusModal(false);
+    await updateTicket({
+      status: pendingStatus,
+      closing_message: closingMessage || null,
+    });
+    setClosingMessage("");
+    setPendingStatus("");
+  };
+
   if (loading) {
     return <div className="card p-6 animate-pulse h-96" />;
   }
@@ -88,55 +110,59 @@ export default function AdminTicketDetailPage() {
     );
   }
 
+  const statusLabel = (s: string) =>
+    s === "in_progress" ? "IN PROGRESS" : s.toUpperCase();
+
   return (
     <div className="space-y-4">
       <Link
         href="/admin/tickets"
-        className="text-coco-accent hover:text-coco-ember text-sm font-bold uppercase tracking-wider"
+        className="text-coco-accent hover:text-coco-ember text-xs sm:text-sm font-bold uppercase tracking-wider min-h-[36px] inline-flex items-center"
       >
         &larr; All Tickets
       </Link>
 
       {/* Ticket Header with Admin Controls */}
-      <div className="card p-5">
-        <div className="flex items-start justify-between gap-4">
-          <div>
-            <div className="flex items-center gap-2 mb-1">
+      <div className="card p-3 sm:p-5">
+        <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4">
+          <div className="min-w-0">
+            <div className="flex items-center gap-2 mb-1 flex-wrap">
               <span
                 className={`text-[10px] font-bold px-2 py-0.5 border ${
                   statusColors[ticket.status] || statusColors.open
                 }`}
               >
-                {ticket.status === "in_progress"
-                  ? "IN PROGRESS"
-                  : ticket.status.toUpperCase()}
+                {statusLabel(ticket.status)}
               </span>
               <span className="text-[10px] font-bold text-coco-coffee/50 uppercase">
                 {ticket.priority}
               </span>
+              <span className="text-[10px] font-bold text-coco-coffee/30 uppercase">
+                {ticket.category.replace("_", " ")}
+              </span>
             </div>
-            <h1 className="text-xl font-black text-coco-dark">
+            <h1 className="text-lg sm:text-xl font-black text-coco-dark">
               {ticket.subject}
             </h1>
-            <p className="text-xs text-coco-coffee/60 mt-1">
+            <p className="text-[10px] sm:text-xs text-coco-coffee/60 mt-1">
               By {ticket.creator_username} ({ticket.user_discord_id}) &middot;{" "}
               {new Date(ticket.created_at).toLocaleString()}
             </p>
             {ticket.assigned_to && (
-              <p className="text-xs text-coco-accent mt-1">
+              <p className="text-[10px] sm:text-xs text-coco-accent mt-1">
                 Assigned to: {ticket.assigned_to}
               </p>
             )}
           </div>
 
           {/* Admin Controls */}
-          <div className="flex flex-col gap-2 flex-shrink-0">
-            {/* Status */}
+          <div className="flex flex-row sm:flex-col gap-2 flex-shrink-0 flex-wrap">
+            {/* Status — opens confirmation modal */}
             <select
               value={ticket.status}
-              onChange={(e) => updateTicket({ status: e.target.value })}
+              onChange={(e) => handleStatusChange(e.target.value)}
               disabled={updating}
-              className="px-2 py-1.5 text-xs font-bold border-2 border-coco-dark/10 bg-white focus:outline-none focus:border-coco-accent"
+              className="px-2 py-1.5 text-xs font-bold border-2 border-coco-dark/10 bg-white focus:outline-none focus:border-coco-accent min-h-[40px]"
             >
               <option value="open">Open</option>
               <option value="in_progress">In Progress</option>
@@ -148,7 +174,7 @@ export default function AdminTicketDetailPage() {
               value={ticket.priority}
               onChange={(e) => updateTicket({ priority: e.target.value })}
               disabled={updating}
-              className="px-2 py-1.5 text-xs font-bold border-2 border-coco-dark/10 bg-white focus:outline-none focus:border-coco-accent"
+              className="px-2 py-1.5 text-xs font-bold border-2 border-coco-dark/10 bg-white focus:outline-none focus:border-coco-accent min-h-[40px]"
             >
               <option value="low">Low</option>
               <option value="normal">Normal</option>
@@ -165,7 +191,7 @@ export default function AdminTicketDetailPage() {
                   })
                 }
                 disabled={updating}
-                className="px-2 py-1.5 text-xs font-bold border-2 border-coco-accent/30 text-coco-accent hover:bg-coco-accent/10 transition-colors"
+                className="px-2 py-1.5 text-xs font-bold border-2 border-coco-accent/30 text-coco-accent hover:bg-coco-accent/10 transition-colors min-h-[40px]"
               >
                 Claim
               </button>
@@ -174,7 +200,7 @@ export default function AdminTicketDetailPage() {
             {/* View user */}
             <Link
               href={`/admin/users/${ticket.user_discord_id}`}
-              className="px-2 py-1.5 text-xs font-bold border-2 border-coco-dark/10 text-coco-coffee text-center hover:border-coco-accent transition-colors"
+              className="px-2 py-1.5 text-xs font-bold border-2 border-coco-dark/10 text-coco-coffee text-center hover:border-coco-accent transition-colors min-h-[40px] flex items-center justify-center"
             >
               View User
             </Link>
@@ -190,6 +216,64 @@ export default function AdminTicketDetailPage() {
           isClosed={ticket.status === "closed"}
         />
       </div>
+
+      {/* Status Change Confirmation Modal */}
+      {showStatusModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50">
+          <div className="bg-white border-2 border-coco-dark/10 shadow-coco-lg w-full max-w-md p-5 sm:p-6 space-y-4">
+            <h3 className="text-lg font-black text-coco-dark">
+              Change Status to {statusLabel(pendingStatus)}
+            </h3>
+            <p className="text-xs sm:text-sm text-coco-coffee/60">
+              {pendingStatus === "closed"
+                ? "This will close the ticket. The user will be notified via DM."
+                : `This will set the ticket to ${statusLabel(pendingStatus)}. The user will be notified via DM.`}
+            </p>
+
+            {/* Optional message */}
+            <div>
+              <label className="block text-[10px] sm:text-xs font-bold text-coco-coffee uppercase tracking-wider mb-1">
+                Message to user (optional)
+              </label>
+              <textarea
+                value={closingMessage}
+                onChange={(e) => setClosingMessage(e.target.value)}
+                rows={3}
+                placeholder={
+                  pendingStatus === "closed"
+                    ? "Reason for closing, resolution details..."
+                    : "Additional notes for the user..."
+                }
+                className="w-full px-3 py-2.5 border-2 border-coco-dark/10 bg-white text-sm focus:outline-none focus:border-coco-accent resize-y"
+              />
+            </div>
+
+            <div className="flex gap-2 justify-end">
+              <button
+                onClick={() => {
+                  setShowStatusModal(false);
+                  setPendingStatus("");
+                  setClosingMessage("");
+                }}
+                className="px-4 py-2 text-xs font-bold border-2 border-coco-dark/10 text-coco-coffee hover:border-coco-dark/20 transition-colors min-h-[40px]"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={confirmStatusChange}
+                disabled={updating}
+                className={`px-4 py-2 text-xs font-bold border-2 min-h-[40px] transition-colors ${
+                  pendingStatus === "closed"
+                    ? "bg-red-500 text-white border-red-600 hover:bg-red-600"
+                    : "btn-primary"
+                }`}
+              >
+                {updating ? "Updating..." : `Confirm ${statusLabel(pendingStatus)}`}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

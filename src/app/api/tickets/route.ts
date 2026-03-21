@@ -4,6 +4,15 @@ import { authOptions } from "@/lib/auth";
 import { getSupabase } from "@/lib/supabase";
 import { isStaff } from "@/lib/roles";
 
+// Determine which ticket categories a role can view
+function getAllowedCategories(role: string | undefined): string[] | null {
+  if (!role) return null; // non-staff, only own tickets
+  if (role === "owner" || role === "executive") return null; // see everything
+  if (role === "admin") return null; // admins see everything
+  if (role === "mod") return ["discord_appeal", "game_appeal", "question"]; // mods can't see business
+  return null;
+}
+
 // GET /api/tickets?status=open&page=1
 export async function GET(req: NextRequest) {
   const session = await getServerSession(authOptions);
@@ -27,6 +36,12 @@ export async function GET(req: NextRequest) {
   // Non-staff users can only see their own tickets
   if (!staff) {
     query = query.eq("user_discord_id", session.user.discordId);
+  } else {
+    // Staff: filter by allowed categories based on role
+    const allowed = getAllowedCategories(session.user.role);
+    if (allowed) {
+      query = query.in("category", allowed);
+    }
   }
 
   if (status && status !== "all") {

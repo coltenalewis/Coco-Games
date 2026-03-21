@@ -36,6 +36,16 @@ export async function GET(
     return NextResponse.json({ error: "Forbidden" }, { status: 403 });
   }
 
+  // Mods can't view business tickets
+  if (
+    isStaff(session.user.role) &&
+    ticket.category === "business" &&
+    session.user.role !== "executive" && session.user.role !== "owner" &&
+    ticket.user_discord_id !== session.user.discordId
+  ) {
+    return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+  }
+
   // Fetch the ticket creator's username
   const { data: creator } = await getSupabase()
     .from("users")
@@ -90,13 +100,87 @@ export async function PATCH(
     return NextResponse.json({ error: "No updates provided" }, { status: 400 });
   }
 
-  const { error } = await getSupabase()
+  const supabase = getSupabase();
+
+  // If closing with a message, add it as a final message
+  if (body.closing_message?.trim()) {
+    await supabase.from("ticket_messages").insert({
+      ticket_id: params.id,
+      author_discord_id: session.user.discordId,
+      content: body.closing_message.trim(),
+    });
+  }
+
+  // Fetch ticket info for DM notification
+  const { data: ticket } = await supabase
+    .from("tickets")
+    .select("user_discord_id, subject, status")
+    .eq("id", params.id)
+    .maybeSingle();
+
+  const { error } = await supabase
     .from("tickets")
     .update(update)
     .eq("id", params.id);
 
   if (error) {
     return NextResponse.json({ error: error.message }, { status: 500 });
+  }
+
+  // DM the ticket creator about the status change
+  if (ticket && body.status && body.status !== ticket.status) {
+    const botToken = process.env.DISCORD_BOT_TOKEN;
+    if (botToken && ticket.user_discord_id) {
+      try {
+        // Open DM channel
+        const dmRes = await fetch("https://discord.com/api/v10/users/@me/channels", {
+          method: "POST",
+          headers: {
+            Authorization: `Bot ${botToken}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ recipient_id: ticket.user_discord_id }),
+        });
+
+        if (dmRes.ok) {
+          const dmChannel = await dmRes.json();
+          const statusLabel = body.status === "closed" ? "Closed" : body.status === "in_progress" ? "In Progress" : "Open";
+
+          const embed: Record<string, unknown> = {
+            title: `Ticket ${statusLabel}: ${ticket.subject}`,
+            color: body.status === "closed" ? 0x9ca3af : body.status === "in_progress" ? 0xf59e0b : 0x22c55e,
+            fields: [
+              { name: "Status", value: statusLabel, inline: true },
+              { name: "Ticket", value: ticket.subject, inline: true },
+            ],
+            footer: { text: "COCO GAMES \u2022 Support" },
+            timestamp: new Date().toISOString(),
+          };
+
+          if (body.closing_message?.trim()) {
+            embed.description = `**Staff Message:**\n${body.closing_message.trim()}`;
+          }
+
+          const url = process.env.NEXT_PUBLIC_SITE_URL || process.env.NEXTAUTH_URL || "http://localhost:3000";
+          (embed.fields as Array<Record<string, unknown>>).push({
+            name: "View Ticket",
+            value: `[Open on site](${url}/tickets/${params.id})`,
+            inline: false,
+          });
+
+          await fetch(`https://discord.com/api/v10/channels/${dmChannel.id}/messages`, {
+            method: "POST",
+            headers: {
+              Authorization: `Bot ${botToken}`,
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ embeds: [embed] }),
+          });
+        }
+      } catch {
+        // DM failed silently — user might have DMs disabled
+      }
+    }
   }
 
   return NextResponse.json({ success: true });

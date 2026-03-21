@@ -19,6 +19,7 @@ const actionLabels: Record<string, { text: string; color: string }> = {
   ban: { text: "BAN", color: "bg-red-100 text-red-700 border-red-300" },
   unban: { text: "UNBAN", color: "bg-green-100 text-green-700 border-green-300" },
   kick: { text: "KICK", color: "bg-orange-100 text-orange-700 border-orange-300" },
+  timeout: { text: "TIMEOUT", color: "bg-purple-100 text-purple-700 border-purple-300" },
   warn: { text: "WARN", color: "bg-yellow-100 text-yellow-700 border-yellow-300" },
   note: { text: "NOTE", color: "bg-blue-100 text-blue-700 border-blue-300" },
 };
@@ -89,7 +90,7 @@ export default function AdminDisciplinePage() {
 
       {/* Filters */}
       <div className="flex gap-2 flex-wrap">
-        {["all", "ban", "unban", "kick", "warn", "note"].map((type) => (
+        {["all", "ban", "unban", "kick", "timeout", "warn", "note"].map((type) => (
           <button
             key={type}
             onClick={() => {
