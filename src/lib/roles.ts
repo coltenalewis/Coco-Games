@@ -1,10 +1,12 @@
-export type UserRole = "owner" | "executive" | "admin" | "mod" | "user";
+export type UserRole = "owner" | "executive" | "admin" | "developer" | "mod" | "contractor" | "user";
 
 const ROLE_HIERARCHY: Record<UserRole, number> = {
-  owner: 4,
-  executive: 3,
-  admin: 2,
-  mod: 1,
+  owner: 6,
+  executive: 5,
+  admin: 4,
+  developer: 3,
+  mod: 2,
+  contractor: 1,
   user: 0,
 };
 
@@ -15,4 +17,8 @@ export function hasMinRole(userRole: UserRole | undefined, required: UserRole): 
 
 export function isStaff(role: UserRole | undefined): boolean {
   return hasMinRole(role, "mod");
+}
+
+export function isTeam(role: UserRole | undefined): boolean {
+  return hasMinRole(role, "contractor");
 }

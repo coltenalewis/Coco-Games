@@ -10,7 +10,7 @@ export interface Database {
           roblox_id: string | null;
           roblox_username: string | null;
           is_owner: boolean;
-          role: "owner" | "executive" | "admin" | "mod" | "user";
+          role: "owner" | "executive" | "admin" | "developer" | "mod" | "contractor" | "user";
           created_at: string;
           updated_at: string;
         };
@@ -22,7 +22,7 @@ export interface Database {
           roblox_id?: string | null;
           roblox_username?: string | null;
           is_owner?: boolean;
-          role?: "owner" | "executive" | "admin" | "mod" | "user";
+          role?: "owner" | "executive" | "admin" | "developer" | "mod" | "contractor" | "user";
           created_at?: string;
           updated_at?: string;
         };
@@ -34,7 +34,7 @@ export interface Database {
           roblox_id?: string | null;
           roblox_username?: string | null;
           is_owner?: boolean;
-          role?: "owner" | "executive" | "admin" | "mod" | "user";
+          role?: "owner" | "executive" | "admin" | "developer" | "mod" | "contractor" | "user";
           updated_at?: string;
         };
       };
@@ -259,6 +259,56 @@ export interface Database {
           recipient_name?: string | null;
           recipient_title?: string | null;
           effective_date?: string | null;
+          updated_at?: string;
+        };
+      };
+      calendar_events: {
+        Row: {
+          id: string;
+          calendar: "development" | "executive" | "staff";
+          title: string;
+          description: string | null;
+          event_type: "event" | "deadline" | "meeting" | "reminder" | "subscription" | "release";
+          start_date: string;
+          end_date: string | null;
+          all_day: boolean;
+          color: string;
+          recurring: "none" | "daily" | "weekly" | "monthly" | "yearly" | null;
+          recurring_until: string | null;
+          amount: number | null;
+          created_by: string;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          calendar: "development" | "executive" | "staff";
+          title: string;
+          description?: string | null;
+          event_type?: "event" | "deadline" | "meeting" | "reminder" | "subscription" | "release";
+          start_date: string;
+          end_date?: string | null;
+          all_day?: boolean;
+          color?: string;
+          recurring?: "none" | "daily" | "weekly" | "monthly" | "yearly" | null;
+          recurring_until?: string | null;
+          amount?: number | null;
+          created_by: string;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: {
+          calendar?: "development" | "executive" | "staff";
+          title?: string;
+          description?: string | null;
+          event_type?: "event" | "deadline" | "meeting" | "reminder" | "subscription" | "release";
+          start_date?: string;
+          end_date?: string | null;
+          all_day?: boolean;
+          color?: string;
+          recurring?: "none" | "daily" | "weekly" | "monthly" | "yearly" | null;
+          recurring_until?: string | null;
+          amount?: number | null;
           updated_at?: string;
         };
       };

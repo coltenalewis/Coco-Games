@@ -86,7 +86,9 @@ const commands = [
         .setRequired(true)
         .addChoices(
           { name: "User", value: "user" },
+          { name: "Contractor", value: "contractor" },
           { name: "Mod", value: "mod" },
+          { name: "Developer", value: "developer" },
           { name: "Admin", value: "admin" },
           { name: "Executive", value: "executive" },
           { name: "Owner", value: "owner" }
@@ -489,7 +491,9 @@ client.on("interactionCreate", async (interaction) => {
 
     const roleColors = {
       user: 0x9ca3af,
+      contractor: 0xf59e0b,
       mod: 0x3b82f6,
+      developer: 0x8b5cf6,
       admin: 0xef4444,
       executive: 0x22c55e,
       owner: 0xd35400,

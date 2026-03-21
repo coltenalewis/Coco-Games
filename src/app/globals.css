@@ -13,6 +13,51 @@ body {
 }
 
 /* ==============================
+   DARK MODE (for staff tools)
+   ============================== */
+.dark-panel {
+  --dp-bg: #1e1e2e;
+  --dp-surface: #252538;
+  --dp-border: #2a2a3d;
+  --dp-text: #e2e2f0;
+  --dp-muted: #8888a0;
+  --dp-hover: #2f2f45;
+  background: var(--dp-bg);
+  color: var(--dp-text);
+}
+
+.dark-panel .card,
+.dark-panel .card-interactive {
+  background: var(--dp-surface);
+  border-color: var(--dp-border);
+  color: var(--dp-text);
+}
+
+.dark-panel .card-interactive:hover {
+  border-color: #E8944A;
+  background: var(--dp-hover);
+}
+
+.dark-panel input,
+.dark-panel textarea,
+.dark-panel select {
+  background: var(--dp-surface) !important;
+  border-color: var(--dp-border) !important;
+  color: var(--dp-text) !important;
+}
+
+.dark-panel input:focus,
+.dark-panel textarea:focus,
+.dark-panel select:focus {
+  border-color: #E8944A !important;
+}
+
+.dark-panel input::placeholder,
+.dark-panel textarea::placeholder {
+  color: var(--dp-muted) !important;
+}
+
+/* ==============================
    BUTTONS & CARDS
    ============================== */
 @layer components {

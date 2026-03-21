@@ -198,3 +198,36 @@ export async function sendWebhookMessage(
     throw new Error(`Webhook send failed: ${res.status}`);
   }
 }
+
+// ============================================
+// SEND DISCORD DM
+// ============================================
+export async function sendDiscordDM(
+  recipientDiscordId: string,
+  embed: Record<string, unknown>
+): Promise<boolean> {
+  try {
+    const dmRes = await fetch(`${DISCORD_API}/users/@me/channels`, {
+      method: "POST",
+      headers: {
+        Authorization: `Bot ${BOT_TOKEN}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ recipient_id: recipientDiscordId }),
+    });
+    if (!dmRes.ok) return false;
+    const dmChannel = await dmRes.json();
+
+    const msgRes = await fetch(`${DISCORD_API}/channels/${dmChannel.id}/messages`, {
+      method: "POST",
+      headers: {
+        Authorization: `Bot ${BOT_TOKEN}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ embeds: [embed] }),
+    });
+    return msgRes.ok;
+  } catch {
+    return false;
+  }
+}

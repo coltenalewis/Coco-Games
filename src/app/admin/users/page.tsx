@@ -19,7 +19,9 @@ const roleBadge: Record<string, string> = {
   owner: "bg-coco-ember text-white border-coco-ember",
   executive: "bg-green-100 text-green-700 border-green-400",
   admin: "bg-red-100 text-red-700 border-red-300",
+  developer: "bg-violet-100 text-violet-700 border-violet-300",
   mod: "bg-blue-100 text-blue-700 border-blue-300",
+  contractor: "bg-amber-100 text-amber-700 border-amber-300",
   user: "bg-gray-100 text-gray-600 border-gray-300",
 };
 
@@ -191,7 +193,9 @@ export default function AdminUsersPage() {
                           } cursor-pointer`}
                         >
                           <option value="user">USER</option>
+                          <option value="contractor">CONTRACTOR</option>
                           <option value="mod">MOD</option>
+                          <option value="developer">DEVELOPER</option>
                           <option value="admin">ADMIN</option>
                           <option value="executive">EXECUTIVE</option>
                           <option value="owner">OWNER</option>

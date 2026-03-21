@@ -64,21 +64,25 @@ export const authOptions: NextAuthOptions = {
           { onConflict: "discord_id" }
         );
 
-        // Fetch the user's role from DB
-        const { data: dbUser } = await getSupabase()
-          .from("users")
-          .select("role")
-          .eq("discord_id", discordProfile.id)
-          .maybeSingle();
-
-        token.role = (dbUser?.role as UserRole) || "user";
-
         // Check if user already has Roblox linked — if so, assign Verified
         await assignVerifiedRole(
           discordProfile.id,
           account.access_token as string
         );
       }
+
+      // Always fetch fresh role from DB on every request
+      // This ensures role changes take effect immediately
+      if (token.discordId) {
+        const { data: dbUser } = await getSupabase()
+          .from("users")
+          .select("role")
+          .eq("discord_id", token.discordId)
+          .maybeSingle();
+
+        token.role = (dbUser?.role as UserRole) || "user";
+      }
+
       return token;
     },
     async session({ session, token }) {
