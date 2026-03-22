@@ -11,7 +11,18 @@ import { hasMinRole } from "@/lib/roles";
 export default function Navbar() {
   const { data: session } = useSession();
   const pathname = usePathname();
-  const role = session?.user?.role;
+
+  // Check for view-as-role cookie (owner impersonation)
+  const [viewAsRole, setViewAsRole] = useState<string | null>(null);
+  useEffect(() => {
+    const match = document.cookie.match(/view_as_role=([^;]+)/);
+    setViewAsRole(match ? match[1] : null);
+  }, [pathname]);
+
+  const realRole = session?.user?.role;
+  const isRealOwner = session?.user?.discordId === process.env.NEXT_PUBLIC_OWNER_DISCORD_ID;
+  const role = (isRealOwner && viewAsRole) ? viewAsRole as typeof realRole : realRole;
+
   const isTeamMember = hasMinRole(role, "contractor");
   const isCoordinator = hasMinRole(role, "coordinator");
   const isExecutive = hasMinRole(role, "executive");
@@ -75,6 +86,9 @@ export default function Navbar() {
       <Link href="/tickets" className={linkClass("/tickets")}>
         Tickets
       </Link>
+      <Link href="/inbox" className={linkClass("/inbox")}>
+        Inbox
+      </Link>
       {isTeamMember && staffTools.length > 0 && (
         <div className="relative" ref={dropdownRef}>
           <button
@@ -118,6 +132,7 @@ export default function Navbar() {
     <>
       <Link href="/profile" className={linkClass("/profile")} onClick={() => setMenuOpen(false)}>Profile</Link>
       <Link href="/tickets" className={linkClass("/tickets")} onClick={() => setMenuOpen(false)}>Tickets</Link>
+      <Link href="/inbox" className={linkClass("/inbox")} onClick={() => setMenuOpen(false)}>Inbox</Link>
 
       {isTeamMember && (
         <div className="border-t border-coco-accent/10 pt-1 mt-1">

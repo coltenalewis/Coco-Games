@@ -420,3 +420,53 @@ body:hover .hover-glow-visible {
     animation: none !important;
   }
 }
+
+/* ==============================
+   PRINT / PDF EXPORT STYLES
+   ============================== */
+@media print {
+  /* Hide navigation, footer, particles, glow, view-as */
+  nav, footer, .hover-glow-visible, .particle,
+  .print\\:hidden, [class*="print:hidden"],
+  button, .btn-primary, .btn-discord {
+    display: none !important;
+  }
+
+  /* Show only the document */
+  body {
+    background: white !important;
+    color: black !important;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  .print-document {
+    border: none !important;
+    box-shadow: none !important;
+    margin: 0 !important;
+    max-width: 100% !important;
+  }
+
+  /* Preserve letterhead colors */
+  .bg-coco-midnight, [class*="bg-coco-midnight"] {
+    background-color: #1A0F08 !important;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  .text-coco-gold {
+    color: #F5B041 !important;
+  }
+
+  /* Page margins */
+  @page {
+    margin: 0.5in;
+    size: letter;
+  }
+
+  /* Signature box */
+  .signature-box {
+    border: 1px solid #ccc !important;
+    background: white !important;
+  }
+}

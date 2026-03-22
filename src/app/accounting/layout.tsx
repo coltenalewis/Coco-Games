@@ -27,10 +27,10 @@ export default async function AccountingLayout({
         {/* Header */}
         <div className="mb-4 sm:mb-8">
           <span className="text-green-600 font-bold text-xs uppercase tracking-[0.2em]">
-            Finance
+            Finance & Operations
           </span>
           <h1 className="text-2xl sm:text-3xl font-black text-coco-dark mt-1">
-            Accounting
+            Accounting & Administration
           </h1>
         </div>
 

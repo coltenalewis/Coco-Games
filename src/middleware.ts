@@ -35,7 +35,7 @@ export async function middleware(request: NextRequest) {
   }
 
   // Auth-only routes
-  if (pathname.startsWith("/profile") || pathname.startsWith("/tickets")) {
+  if (pathname.startsWith("/profile") || pathname.startsWith("/tickets") || pathname.startsWith("/inbox")) {
     if (!token) return NextResponse.redirect(new URL("/", request.url));
     return NextResponse.next();
   }
@@ -64,5 +64,6 @@ export const config = {
     "/boards/:path*",
     "/requests/:path*",
     "/tickets/:path*",
+    "/inbox/:path*",
   ],
 };

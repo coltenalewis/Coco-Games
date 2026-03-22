@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef, useCallback } from "react";
+import { useState, useRef, useCallback, useEffect } from "react";
 import { useRouter } from "next/navigation";
 
 // ============================================
@@ -361,11 +361,184 @@ function ContractEditor({ content, onChange }: { content: string; onChange: (c: 
 }
 
 // ============================================
+// FORM FIELDS SECTION (after save)
+// ============================================
+interface FormFieldDef {
+  id: string;
+  label: string;
+  type: string;
+  required: boolean;
+  options: string[] | null;
+  sort_order: number;
+}
+
+const FIELD_TYPES = ["text", "email", "date", "number", "textarea", "checkbox", "select", "signature"] as const;
+
+function FormFieldsSection({ documentId }: { documentId: string | null }) {
+  const [fields, setFields] = useState<FormFieldDef[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [showAdd, setShowAdd] = useState(false);
+  const [newLabel, setNewLabel] = useState("");
+  const [newType, setNewType] = useState<string>("text");
+  const [newRequired, setNewRequired] = useState(false);
+  const [newOptions, setNewOptions] = useState("");
+  const [saving, setSaving] = useState(false);
+
+  useEffect(() => {
+    if (!documentId) return;
+    setLoading(true);
+    fetch(`/api/accounting/documents/fields?document_id=${documentId}`)
+      .then((r) => r.json())
+      .then((data) => setFields(data.fields || []))
+      .finally(() => setLoading(false));
+  }, [documentId]);
+
+  const addField = async () => {
+    if (!documentId || !newLabel.trim()) return;
+    setSaving(true);
+    try {
+      const res = await fetch("/api/accounting/documents/fields", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          document_id: documentId,
+          label: newLabel.trim(),
+          type: newType,
+          required: newRequired,
+          options: newType === "select" ? newOptions.split(",").map((o) => o.trim()).filter(Boolean) : null,
+          sort_order: fields.length,
+        }),
+      });
+      if (res.ok) {
+        const field = await res.json();
+        setFields((prev) => [...prev, field]);
+        setNewLabel("");
+        setNewType("text");
+        setNewRequired(false);
+        setNewOptions("");
+        setShowAdd(false);
+      }
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const deleteField = async (fieldId: string) => {
+    await fetch("/api/accounting/documents/fields", {
+      method: "DELETE",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ id: fieldId }),
+    });
+    setFields((prev) => prev.filter((f) => f.id !== fieldId));
+  };
+
+  if (!documentId) {
+    return (
+      <div className="card p-4 sm:p-6">
+        <h3 className="text-sm font-black text-coco-dark uppercase tracking-wider mb-2">Form Fields</h3>
+        <p className="text-xs text-coco-coffee/50">Save the document first to add form fields.</p>
+      </div>
+    );
+  }
+
+  return (
+    <div className="card p-4 sm:p-6">
+      <div className="flex items-center justify-between mb-3">
+        <h3 className="text-sm font-black text-coco-dark uppercase tracking-wider">Form Fields</h3>
+        <button
+          type="button"
+          onClick={() => setShowAdd(!showAdd)}
+          className="text-xs text-green-600 hover:text-green-800 font-bold min-h-[40px] px-3 border border-green-300 hover:border-green-500 transition-colors"
+        >
+          + Add Field
+        </button>
+      </div>
+
+      {loading && <p className="text-xs text-coco-coffee/50">Loading fields...</p>}
+
+      {/* Existing fields */}
+      {fields.length > 0 && (
+        <div className="space-y-2 mb-4">
+          {fields.sort((a, b) => a.sort_order - b.sort_order).map((field) => (
+            <div key={field.id} className="flex items-center gap-2 p-2 border border-coco-dark/5 bg-coco-warm/30">
+              <span className="text-sm font-medium text-coco-dark flex-1">{field.label}</span>
+              <span className="text-[10px] font-bold px-2 py-0.5 border bg-purple-50 text-purple-600 border-purple-200">
+                {field.type}
+              </span>
+              {field.required && (
+                <span className="text-[10px] font-bold px-2 py-0.5 border bg-red-50 text-red-500 border-red-200">
+                  Required
+                </span>
+              )}
+              <button
+                onClick={() => deleteField(field.id)}
+                className="text-red-400 hover:text-red-600 font-bold text-lg min-w-[40px] min-h-[40px] flex items-center justify-center"
+              >
+                &times;
+              </button>
+            </div>
+          ))}
+        </div>
+      )}
+
+      {/* Add field inline form */}
+      {showAdd && (
+        <div className="border-t border-coco-dark/5 pt-3 space-y-3">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div>
+              <label className="block text-[10px] font-bold text-coco-coffee uppercase tracking-wider mb-1">Label</label>
+              <input
+                type="text"
+                value={newLabel}
+                onChange={(e) => setNewLabel(e.target.value)}
+                placeholder="Field label..."
+                className={inputCls}
+              />
+            </div>
+            <div>
+              <label className="block text-[10px] font-bold text-coco-coffee uppercase tracking-wider mb-1">Type</label>
+              <select value={newType} onChange={(e) => setNewType(e.target.value)} className={inputCls}>
+                {FIELD_TYPES.map((t) => (
+                  <option key={t} value={t}>{t.charAt(0).toUpperCase() + t.slice(1)}</option>
+                ))}
+              </select>
+            </div>
+          </div>
+          {newType === "select" && (
+            <div>
+              <label className="block text-[10px] font-bold text-coco-coffee uppercase tracking-wider mb-1">Options (comma-separated)</label>
+              <input
+                type="text"
+                value={newOptions}
+                onChange={(e) => setNewOptions(e.target.value)}
+                placeholder="Option 1, Option 2, Option 3..."
+                className={inputCls}
+              />
+            </div>
+          )}
+          <label className="flex items-center gap-2 min-h-[40px] cursor-pointer">
+            <input type="checkbox" checked={newRequired} onChange={(e) => setNewRequired(e.target.checked)} className="w-4 h-4 accent-green-600" />
+            <span className="text-xs font-bold text-coco-coffee">Required field</span>
+          </label>
+          <div className="flex gap-2">
+            <button onClick={() => setShowAdd(false)} className="text-xs px-3 py-2 font-bold border-2 border-coco-dark/10 text-coco-coffee min-h-[40px]">Cancel</button>
+            <button onClick={addField} disabled={saving || !newLabel.trim()} className="btn-primary text-xs !px-3 !py-2 disabled:opacity-50 min-h-[40px]">
+              {saving ? "Adding..." : "Add Field"}
+            </button>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ============================================
 // MAIN PAGE
 // ============================================
 export default function NewDocumentPage() {
   const router = useRouter();
   const [saving, setSaving] = useState(false);
+  const [savedDocId, setSavedDocId] = useState<string | null>(null);
   const [docType, setDocType] = useState<"contract" | "invoice" | "letter" | "memo">("contract");
   const [showPreview, setShowPreview] = useState(false);
 
@@ -417,6 +590,7 @@ export default function NewDocumentPage() {
       });
       if (res.ok) {
         const doc = await res.json();
+        setSavedDocId(doc.id);
         router.push(`/accounting/documents/${doc.id}`);
       } else {
         const data = await res.json();
@@ -600,6 +774,9 @@ export default function NewDocumentPage() {
           {docType === "letter" && <LetterForm data={letterData} onChange={setLetterData} />}
         </div>
       )}
+
+      {/* Form Fields Section */}
+      <FormFieldsSection documentId={savedDocId} />
     </div>
   );
 }

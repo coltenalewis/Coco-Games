@@ -55,7 +55,7 @@ export async function PATCH(req: NextRequest) {
     );
   }
 
-  const { discordId, role } = await req.json();
+  const { discordId, role, note } = await req.json();
 
   if (!discordId || !role) {
     return NextResponse.json(
@@ -79,6 +79,15 @@ export async function PATCH(req: NextRequest) {
 
   const supabase = getSupabase();
 
+  // Get old role for audit log
+  const { data: targetUser } = await supabase
+    .from("users")
+    .select("role, discord_username")
+    .eq("discord_id", discordId)
+    .maybeSingle();
+
+  const oldRole = targetUser?.role || "user";
+
   const { error } = await supabase
     .from("users")
     .update({ role })
@@ -87,6 +96,18 @@ export async function PATCH(req: NextRequest) {
   if (error) {
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
+
+  // Audit log
+  const { logAudit } = await import("@/lib/audit");
+  await logAudit({
+    action: "role_change",
+    actorDiscordId: session.user.discordId!,
+    targetType: "user",
+    targetId: discordId,
+    targetName: targetUser?.discord_username || discordId,
+    details: { oldRole, newRole: role },
+    note: note || null,
+  });
 
   // Sync Discord roles across all configured guilds
   const syncResults: { guildId: string; success: boolean; error?: string }[] = [];

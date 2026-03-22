@@ -63,17 +63,13 @@ export default function AdminUsersPage() {
   };
 
   const handleRoleChange = async (discordId: string, newRole: string) => {
-    if (
-      !confirm(
-        `Change this user's role to ${newRole.toUpperCase()}?`
-      )
-    )
-      return;
+    const note = prompt(`Change role to ${newRole.toUpperCase()}?\n\nAdd a note (optional):`, "");
+    if (note === null) return; // cancelled
 
     const res = await fetch("/api/admin/users", {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ discordId, role: newRole }),
+      body: JSON.stringify({ discordId, role: newRole, note: note || null }),
     });
 
     if (res.ok) {
