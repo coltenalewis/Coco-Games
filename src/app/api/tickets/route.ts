@@ -78,6 +78,12 @@ export async function POST(req: NextRequest) {
   const validCategories = ["discord_appeal", "game_appeal", "question", "business", "bug_report", "game_report"];
   const ticketCategory = validCategories.includes(category) ? category : "question";
 
+  // Auto-flag bug reports from QA as urgent
+  let ticketPriority = priority || "normal";
+  if (ticketCategory === "bug_report" && session.user.role === "qa") {
+    ticketPriority = "urgent";
+  }
+
   const supabase = getSupabase();
 
   const { data: ticket, error: ticketError } = await supabase
@@ -86,7 +92,7 @@ export async function POST(req: NextRequest) {
       user_discord_id: session.user.discordId,
       subject: subject.trim(),
       category: ticketCategory,
-      priority: priority || "normal",
+      priority: ticketPriority,
       server_name: server_name || "General",
     })
     .select("id, ticket_number")

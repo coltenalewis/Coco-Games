@@ -29,6 +29,7 @@ const roleBadge: Record<string, string> = {
   admin: "bg-red-100 text-red-700",
   developer: "bg-violet-100 text-violet-700",
   coordinator: "bg-cyan-100 text-cyan-700",
+  qa: "bg-teal-100 text-teal-700",
   mod: "bg-blue-100 text-blue-700",
   contractor: "bg-amber-100 text-amber-700",
   user: "",
@@ -125,6 +126,10 @@ export default function TicketChat({
   };
 
   const getAvatarUrl = (msg: Message) => {
+    // Staff get a generic COCO GAMES avatar instead of their personal one
+    if (msg.is_staff) {
+      return "/CocoGamesLogo.png";
+    }
     if (msg.author_avatar) {
       return `https://cdn.discordapp.com/avatars/${msg.author_discord_id}/${msg.author_avatar}.png?size=64`;
     }

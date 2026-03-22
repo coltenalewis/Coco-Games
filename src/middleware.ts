@@ -6,11 +6,11 @@ import { getToken } from "next-auth/jwt";
 // These are overridden by the site_permissions table at runtime via API routes
 const PAGE_ROLES: Record<string, string[]> = {
   "/dashboard": ["owner"],
-  "/admin": ["coordinator", "admin", "developer", "executive", "owner"],
+  "/admin": ["mod", "qa", "coordinator", "admin", "developer", "executive", "owner"],
   "/accounting": ["executive", "owner"],
-  "/calendar": ["contractor", "mod", "coordinator", "developer", "admin", "executive", "owner"],
-  "/boards": ["contractor", "mod", "coordinator", "developer", "admin", "executive", "owner"],
-  "/requests": ["contractor", "mod", "coordinator", "developer", "admin", "executive", "owner"],
+  "/calendar": ["contractor", "mod", "qa", "coordinator", "developer", "admin", "executive", "owner"],
+  "/boards": ["contractor", "mod", "qa", "coordinator", "developer", "admin", "executive", "owner"],
+  "/requests": ["contractor", "mod", "qa", "coordinator", "developer", "admin", "executive", "owner"],
 };
 
 export async function middleware(request: NextRequest) {

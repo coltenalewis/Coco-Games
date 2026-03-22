@@ -1,7 +1,7 @@
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { redirect } from "next/navigation";
-import { hasMinRole } from "@/lib/roles";
+import { isStaff } from "@/lib/roles";
 import Link from "next/link";
 import { hasPermission } from "@/lib/permissions";
 
@@ -24,7 +24,7 @@ export default async function AdminLayout({
 }) {
   const session = await getServerSession(authOptions);
 
-  if (!session || !hasMinRole(session.user?.role, "mod")) {
+  if (!session || !isStaff(session.user?.role)) {
     redirect("/");
   }
 

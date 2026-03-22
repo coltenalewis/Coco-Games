@@ -84,46 +84,52 @@ export default function AdminTicketsPage() {
         </div>
       </div>
 
-      {/* Status Filters */}
-      <div className="flex flex-wrap gap-2">
-        {["all", "open", "in_progress", "closed"].map((s) => (
-          <button
-            key={s}
-            onClick={() => {
-              setFilter(s);
-              setPage(1);
-            }}
-            className={`px-3 py-1.5 text-xs font-bold uppercase tracking-wider border-2 transition-all ${
-              filter === s
-                ? "bg-coco-dark text-coco-gold border-coco-dark"
-                : "bg-white text-coco-dark border-coco-dark/15 hover:border-coco-accent"
-            }`}
+      {/* Filters Row */}
+      <div className="flex flex-wrap gap-3">
+        <div>
+          <label className="block text-[10px] font-bold text-coco-coffee/50 uppercase tracking-wider mb-1">Status</label>
+          <select
+            value={filter}
+            onChange={(e) => { setFilter(e.target.value); setPage(1); }}
+            className="px-3 py-2 text-xs font-bold border-2 border-coco-dark/10 bg-white text-coco-dark focus:outline-none focus:border-coco-accent min-h-[40px] min-w-[140px]"
           >
-            {s === "in_progress"
-              ? "In Progress"
-              : s.charAt(0).toUpperCase() + s.slice(1)}
-          </button>
-        ))}
-      </div>
+            <option value="all">All Status</option>
+            <option value="open">Open</option>
+            <option value="in_progress">In Progress</option>
+            <option value="closed">Closed</option>
+          </select>
+        </div>
 
-      {/* Server Filters */}
-      <div className="flex flex-wrap gap-2">
-        {["all", "General", "Country Conquesters", "Discord Server"].map((s) => (
-          <button
-            key={s}
-            onClick={() => {
-              setServerFilter(s);
-              setPage(1);
-            }}
-            className={`px-3 py-1.5 text-xs font-bold uppercase tracking-wider border-2 transition-all ${
-              serverFilter === s
-                ? "bg-coco-dark text-coco-gold border-coco-dark"
-                : "bg-white text-coco-dark border-coco-dark/15 hover:border-coco-accent"
-            }`}
+        <div>
+          <label className="block text-[10px] font-bold text-coco-coffee/50 uppercase tracking-wider mb-1">Server</label>
+          <select
+            value={serverFilter}
+            onChange={(e) => { setServerFilter(e.target.value); setPage(1); }}
+            className="px-3 py-2 text-xs font-bold border-2 border-coco-dark/10 bg-white text-coco-dark focus:outline-none focus:border-coco-accent min-h-[40px] min-w-[160px]"
           >
-            {s === "all" ? "All Servers" : s}
-          </button>
-        ))}
+            <option value="all">All Servers</option>
+            <option value="General">General</option>
+            <option value="Country Conquesters">Country Conquesters</option>
+            <option value="Discord Server">Discord Server</option>
+          </select>
+        </div>
+
+        <div>
+          <label className="block text-[10px] font-bold text-coco-coffee/50 uppercase tracking-wider mb-1">Category</label>
+          <select
+            value=""
+            onChange={() => { /* category filter */ }}
+            className="px-3 py-2 text-xs font-bold border-2 border-coco-dark/10 bg-white text-coco-dark focus:outline-none focus:border-coco-accent min-h-[40px] min-w-[150px]"
+          >
+            <option value="">All Categories</option>
+            <option value="question">Questions</option>
+            <option value="bug_report">Bug Reports</option>
+            <option value="game_report">Game Reports</option>
+            <option value="discord_appeal">Discord Appeals</option>
+            <option value="game_appeal">Game Appeals</option>
+            <option value="business">Business</option>
+          </select>
+        </div>
       </div>
 
       {/* Tickets */}

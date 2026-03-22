@@ -1,13 +1,14 @@
-export type UserRole = "owner" | "executive" | "admin" | "developer" | "coordinator" | "mod" | "contractor" | "user";
+export type UserRole = "owner" | "executive" | "admin" | "developer" | "coordinator" | "qa" | "mod" | "contractor" | "user";
 
-export const ALL_ROLES: UserRole[] = ["owner", "executive", "admin", "developer", "coordinator", "mod", "contractor", "user"];
+export const ALL_ROLES: UserRole[] = ["owner", "executive", "admin", "developer", "coordinator", "qa", "mod", "contractor", "user"];
 
 const ROLE_HIERARCHY: Record<UserRole, number> = {
-  owner: 7,
-  executive: 6,
-  admin: 5,
-  developer: 4,
-  coordinator: 3,
+  owner: 8,
+  executive: 7,
+  admin: 6,
+  developer: 5,
+  coordinator: 4,
+  qa: 3,
   mod: 2,
   contractor: 1,
   user: 0,
@@ -19,6 +20,7 @@ export const ROLE_LABELS: Record<UserRole, string> = {
   admin: "Admin",
   developer: "Developer",
   coordinator: "Coordinator",
+  qa: "Quality Assurance",
   mod: "Moderator",
   contractor: "Contractor",
   user: "User",
@@ -30,6 +32,7 @@ export const ROLE_COLORS: Record<UserRole, string> = {
   admin: "bg-red-100 text-red-700 border-red-300",
   developer: "bg-violet-100 text-violet-700 border-violet-300",
   coordinator: "bg-cyan-100 text-cyan-700 border-cyan-300",
+  qa: "bg-teal-100 text-teal-700 border-teal-300",
   mod: "bg-blue-100 text-blue-700 border-blue-300",
   contractor: "bg-amber-100 text-amber-700 border-amber-300",
   user: "bg-gray-100 text-gray-600 border-gray-300",

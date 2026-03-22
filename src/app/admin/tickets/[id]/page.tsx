@@ -215,7 +215,8 @@ export default function AdminTicketDetailPage() {
               Escalate
             </button>
 
-            {ticket.assigned_to !== session?.user?.discordId && (
+            {ticket.assigned_to !== session?.user?.discordId &&
+             ticket.user_discord_id !== session?.user?.discordId && (
               <button
                 onClick={() => updateTicket({ assigned_to: session?.user?.discordId || null })}
                 disabled={updating}

@@ -10,7 +10,7 @@ export interface Database {
           roblox_id: string | null;
           roblox_username: string | null;
           is_owner: boolean;
-          role: "owner" | "executive" | "admin" | "developer" | "coordinator" | "mod" | "contractor" | "user";
+          role: "owner" | "executive" | "admin" | "developer" | "coordinator" | "qa" | "mod" | "contractor" | "user";
           created_at: string;
           updated_at: string;
         };
@@ -22,7 +22,7 @@ export interface Database {
           roblox_id?: string | null;
           roblox_username?: string | null;
           is_owner?: boolean;
-          role?: "owner" | "executive" | "admin" | "developer" | "coordinator" | "mod" | "contractor" | "user";
+          role?: "owner" | "executive" | "admin" | "developer" | "coordinator" | "qa" | "mod" | "contractor" | "user";
           created_at?: string;
           updated_at?: string;
         };
@@ -34,7 +34,7 @@ export interface Database {
           roblox_id?: string | null;
           roblox_username?: string | null;
           is_owner?: boolean;
-          role?: "owner" | "executive" | "admin" | "developer" | "coordinator" | "mod" | "contractor" | "user";
+          role?: "owner" | "executive" | "admin" | "developer" | "coordinator" | "qa" | "mod" | "contractor" | "user";
           updated_at?: string;
         };
       };

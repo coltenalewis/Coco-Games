@@ -13,6 +13,7 @@ const SITE_ROLES = [
   { key: "contractorRoleId", label: "Contractor", desc: "Assigned to contractors" },
   { key: "moderatorRoleId", label: "Moderator", desc: "Assigned to moderators" },
   { key: "coordinatorRoleId", label: "Coordinator", desc: "Assigned to coordinators" },
+  { key: "qaRoleId", label: "QA", desc: "Assigned to quality assurance team" },
   { key: "developerRoleId", label: "Developer", desc: "Assigned to developers" },
   { key: "adminRoleId", label: "Admin", desc: "Assigned to admins" },
   { key: "executiveRoleId", label: "Executive", desc: "Assigned to executives" },
