@@ -148,9 +148,34 @@ export default function BoardDetailPage() {
   const handleDragEnd = async (result: DropResult) => {
     if (!result.destination || !data) return;
 
-    const { draggableId, source, destination } = result;
+    const { draggableId, source, destination, type } = result;
 
-    // Optimistic update
+    // ---- LIST REORDER ----
+    if (type === "list") {
+      const newLists = [...data.lists];
+      const [moved] = newLists.splice(source.index, 1);
+      newLists.splice(destination.index, 0, moved);
+
+      // Update positions
+      const reorderedLists = newLists.map((l, i) => ({ ...l, position: i }));
+      setData({ ...data, lists: reorderedLists });
+
+      try {
+        const res = await fetch(`/api/boards/${boardId}/lists`, {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            lists: reorderedLists.map((l, i) => ({ id: l.id, position: i })),
+          }),
+        });
+        if (!res.ok) fetchBoard();
+      } catch {
+        fetchBoard();
+      }
+      return;
+    }
+
+    // ---- CARD REORDER ----
     const newLists = data.lists.map((list) => ({
       ...list,
       cards: [...list.cards],
@@ -177,7 +202,7 @@ export default function BoardDetailPage() {
       });
       if (!res.ok) {
         console.error("Reorder failed:", await res.text());
-        fetchBoard(); // Revert on error
+        fetchBoard();
       }
     } catch {
       fetchBoard();
@@ -299,16 +324,25 @@ export default function BoardDetailPage() {
       {/* Kanban Board */}
       <div className="flex-1 overflow-x-auto overflow-y-hidden">
         <DragDropContext onDragEnd={handleDragEnd}>
-          <div className="flex gap-4 p-4 h-full min-w-max">
+          <Droppable droppableId="board-lists" type="list" direction="horizontal">
+            {(boardProvided) => (
+              <div
+                ref={boardProvided.innerRef}
+                {...boardProvided.droppableProps}
+                className="flex gap-4 p-4 h-full min-w-max"
+              >
             {lists
               .sort((a, b) => a.position - b.position)
-              .map((list) => (
+              .map((list, listIndex) => (
+                <Draggable key={list.id} draggableId={`list-${list.id}`} index={listIndex}>
+                  {(listProvided, listSnapshot) => (
                 <div
-                  key={list.id}
-                  className="w-72 sm:w-80 flex-shrink-0 flex flex-col bg-[#252538] border border-[#2a2a3d] rounded-sm max-h-[calc(100vh-160px)]"
+                  ref={listProvided.innerRef}
+                  {...listProvided.draggableProps}
+                  className={`w-72 sm:w-80 flex-shrink-0 flex flex-col bg-[#252538] border border-[#2a2a3d] rounded-sm max-h-[calc(100vh-160px)] ${listSnapshot.isDragging ? "shadow-xl shadow-black/40 rotate-1" : ""}`}
                 >
-                  {/* List Header */}
-                  <div className="px-3 py-2.5 border-b border-[#2a2a3d] flex-shrink-0 flex items-center justify-between">
+                  {/* List Header - drag handle */}
+                  <div {...listProvided.dragHandleProps} className="px-3 py-2.5 border-b border-[#2a2a3d] flex-shrink-0 flex items-center justify-between cursor-grab active:cursor-grabbing">
                     <div>
                       <h3 className="text-xs font-bold text-gray-300 uppercase tracking-wider">
                         {list.name}
@@ -329,7 +363,7 @@ export default function BoardDetailPage() {
                   </div>
 
                   {/* Cards */}
-                  <Droppable droppableId={list.id}>
+                  <Droppable droppableId={list.id} type="card">
                     {(provided, snapshot) => (
                       <div
                         ref={provided.innerRef}
@@ -529,7 +563,10 @@ export default function BoardDetailPage() {
                     )}
                   </div>
                 </div>
+                  )}
+                </Draggable>
               ))}
+              {boardProvided.placeholder}
 
             {/* Add List */}
             <div className="w-72 sm:w-80 flex-shrink-0">
@@ -574,7 +611,9 @@ export default function BoardDetailPage() {
                 </button>
               )}
             </div>
-          </div>
+              </div>
+            )}
+          </Droppable>
         </DragDropContext>
       </div>
 
