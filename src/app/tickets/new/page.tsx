@@ -8,7 +8,7 @@ function NewTicketForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const initialCategory = searchParams.get("category") || "question";
-  const validCategories = ["discord_appeal", "game_appeal", "question", "business"];
+  const validCategories = ["discord_appeal", "game_appeal", "question", "business", "bug_report", "game_report"];
 
   const [subject, setSubject] = useState("");
   const [category, setCategory] = useState(
@@ -118,6 +118,8 @@ function NewTicketForm() {
           <div className="flex flex-wrap gap-2">
             {[
               { value: "question", label: "Question", icon: "?" },
+              { value: "bug_report", label: "Bug Report", icon: "!" },
+              { value: "game_report", label: "Game Report", icon: "R" },
               { value: "discord_appeal", label: "Discord Appeal", icon: "D" },
               { value: "game_appeal", label: "Game Appeal", icon: "G" },
               { value: "business", label: "Business Inquiry", icon: "B" },

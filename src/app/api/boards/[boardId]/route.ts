@@ -37,12 +37,50 @@ export async function GET(
   // Fetch assignees and card-label assignments for all cards
   const cardIds = (cardsRes.data || []).map((c: { id: string }) => c.id);
 
-  const [assigneesRes, cardLabelsRes] = cardIds.length > 0
+  const [assigneesRes, cardLabelsRes, checklistsRes, checklistItemsRes] = cardIds.length > 0
     ? await Promise.all([
         supabase.from("card_assignees").select("card_id, discord_id").in("card_id", cardIds),
         supabase.from("card_labels").select("card_id, label_id").in("card_id", cardIds),
+        supabase.from("card_checklists").select("id, card_id").in("card_id", cardIds),
+        supabase.from("checklist_items").select("checklist_id, completed").in("checklist_id",
+          ((await supabase.from("card_checklists").select("id").in("card_id", cardIds)).data || []).map((c: { id: string }) => c.id)
+        ),
       ])
-    : [{ data: [] }, { data: [] }];
+    : [{ data: [] }, { data: [] }, { data: [] }, { data: [] }];
+
+  // Build checklist progress per card
+  const checklistsByCard = new Map<string, string[]>();
+  for (const cl of checklistsRes.data || []) {
+    const list = checklistsByCard.get(cl.card_id) || [];
+    list.push(cl.id);
+    checklistsByCard.set(cl.card_id, list);
+  }
+
+  const checklistProgress: Record<string, { total: number; done: number }> = {};
+  for (const [cardId, clIds] of Array.from(checklistsByCard.entries())) {
+    const items = (checklistItemsRes.data || []).filter((i: { checklist_id: string }) => clIds.includes(i.checklist_id));
+    checklistProgress[cardId] = {
+      total: items.length,
+      done: items.filter((i: { completed: boolean }) => i.completed).length,
+    };
+  }
+
+  // Fetch assignee usernames
+  const assigneeDiscordIds = Array.from(new Set((assigneesRes.data || []).map((a: { discord_id: string }) => a.discord_id)));
+  const { data: assigneeUsers } = assigneeDiscordIds.length > 0
+    ? await supabase.from("users").select("discord_id, discord_username, discord_avatar").in("discord_id", assigneeDiscordIds)
+    : { data: [] };
+
+  const userMap = new Map((assigneeUsers || []).map((u: { discord_id: string; discord_username: string; discord_avatar: string | null }) => [u.discord_id, u]));
+
+  const enrichedAssignees = (assigneesRes.data || []).map((a: { card_id: string; discord_id: string }) => {
+    const user = userMap.get(a.discord_id);
+    return {
+      ...a,
+      username: user?.discord_username || a.discord_id,
+      avatar: user?.discord_avatar || null,
+    };
+  });
 
   return NextResponse.json({
     ...board,
@@ -50,8 +88,9 @@ export async function GET(
     lists: listsRes.data || [],
     cards: cardsRes.data || [],
     labels: labelsRes.data || [],
-    assignees: assigneesRes.data || [],
+    assignees: enrichedAssignees,
     cardLabels: cardLabelsRes.data || [],
+    checklistProgress,
   });
 }
 

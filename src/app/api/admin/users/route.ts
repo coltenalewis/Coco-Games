@@ -64,7 +64,7 @@ export async function PATCH(req: NextRequest) {
     );
   }
 
-  const validRoles = ["owner", "executive", "admin", "developer", "mod", "contractor", "user"];
+  const validRoles = ["owner", "executive", "admin", "developer", "coordinator", "mod", "contractor", "user"];
   if (!validRoles.includes(role)) {
     return NextResponse.json({ error: "Invalid role" }, { status: 400 });
   }
@@ -94,35 +94,41 @@ export async function PATCH(req: NextRequest) {
   try {
     const { data: configs } = await supabase
       .from("guild_configs")
-      .select("guild_id, moderator_role_id, admin_role_id")
-      .or("moderator_role_id.not.is.null,admin_role_id.not.is.null");
+      .select("guild_id, moderator_role_id, coordinator_role_id, admin_role_id, developer_role_id, contractor_role_id, executive_role_id, owner_role_id");
 
     if (configs && configs.length > 0) {
       const { addGuildMemberRole, removeGuildMemberRole } = await import("@/lib/discord");
 
+      // Map: site role -> which discord role columns they should have
+      const roleMapping: Record<string, string[]> = {
+        owner: ["owner_role_id", "executive_role_id", "admin_role_id", "developer_role_id", "coordinator_role_id", "moderator_role_id"],
+        executive: ["executive_role_id", "admin_role_id", "developer_role_id", "coordinator_role_id", "moderator_role_id"],
+        admin: ["admin_role_id", "developer_role_id", "coordinator_role_id", "moderator_role_id"],
+        developer: ["developer_role_id", "coordinator_role_id", "moderator_role_id"],
+        coordinator: ["coordinator_role_id", "moderator_role_id"],
+        mod: ["moderator_role_id"],
+        contractor: ["contractor_role_id"],
+        user: [],
+      };
+
+      const allRoleColumns = ["owner_role_id", "executive_role_id", "admin_role_id", "developer_role_id", "coordinator_role_id", "moderator_role_id", "contractor_role_id"];
+      const shouldHave = new Set(roleMapping[role] || []);
+
       for (const config of configs) {
         try {
-          // Handle admin role
-          if (config.admin_role_id) {
-            if (role === "admin" || role === "developer" || role === "executive" || role === "owner") {
-              await addGuildMemberRole(config.guild_id, discordId, config.admin_role_id);
-            } else {
-              await removeGuildMemberRole(config.guild_id, discordId, config.admin_role_id);
-            }
-          }
+          for (const col of allRoleColumns) {
+            const discordRoleId = (config as Record<string, string | null>)[col];
+            if (!discordRoleId) continue;
 
-          // Handle moderator role
-          if (config.moderator_role_id) {
-            if (role === "mod" || role === "developer" || role === "admin" || role === "executive" || role === "owner") {
-              await addGuildMemberRole(config.guild_id, discordId, config.moderator_role_id);
+            if (shouldHave.has(col)) {
+              await addGuildMemberRole(config.guild_id, discordId, discordRoleId);
             } else {
-              await removeGuildMemberRole(config.guild_id, discordId, config.moderator_role_id);
+              await removeGuildMemberRole(config.guild_id, discordId, discordRoleId);
             }
           }
 
           syncResults.push({ guildId: config.guild_id, success: true });
         } catch (err) {
-          // User might not be in this guild — that's fine
           syncResults.push({
             guildId: config.guild_id,
             success: false,

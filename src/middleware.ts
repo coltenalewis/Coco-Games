@@ -2,96 +2,45 @@ import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 import { getToken } from "next-auth/jwt";
 
-// Roles that count as "team" (contractor+)
-const TEAM_ROLES = ["contractor", "mod", "developer", "admin", "executive", "owner"];
-const ADMIN_ROLES = ["admin", "developer", "executive", "owner"];
-const EXEC_ROLES = ["executive", "owner"];
+// Default role-page mappings (used as fallback if permissions DB unavailable)
+// These are overridden by the site_permissions table at runtime via API routes
+const PAGE_ROLES: Record<string, string[]> = {
+  "/dashboard": ["owner"],
+  "/admin": ["coordinator", "admin", "developer", "executive", "owner"],
+  "/accounting": ["executive", "owner"],
+  "/calendar": ["contractor", "mod", "coordinator", "developer", "admin", "executive", "owner"],
+  "/boards": ["contractor", "mod", "coordinator", "developer", "admin", "executive", "owner"],
+  "/requests": ["contractor", "mod", "coordinator", "developer", "admin", "executive", "owner"],
+};
 
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
-  // Skip static files and API auth routes
+  // Skip static files
   if (
     pathname.startsWith("/_next") ||
     pathname.startsWith("/api/auth") ||
-    pathname.includes(".") // static files like favicon.ico, images, etc.
+    pathname.includes(".")
   ) {
     return NextResponse.next();
   }
 
   const token = await getToken({ req: request });
 
-  // Protect /profile - requires authentication
-  if (pathname.startsWith("/profile")) {
-    if (!token) {
-      return NextResponse.redirect(new URL("/", request.url));
-    }
+  // Auth-only routes
+  if (pathname.startsWith("/profile") || pathname.startsWith("/tickets")) {
+    if (!token) return NextResponse.redirect(new URL("/", request.url));
+    return NextResponse.next();
   }
 
-  // Protect /dashboard - requires owner
-  if (pathname.startsWith("/dashboard")) {
-    if (!token) {
-      return NextResponse.redirect(new URL("/", request.url));
-    }
-    if (token.role !== "owner") {
-      return NextResponse.redirect(new URL("/profile", request.url));
-    }
-  }
-
-  // Protect /admin - requires admin or higher
-  if (pathname.startsWith("/admin")) {
-    if (!token) {
-      return NextResponse.redirect(new URL("/", request.url));
-    }
-    if (!ADMIN_ROLES.includes(token.role as string)) {
-      return NextResponse.redirect(new URL("/profile", request.url));
-    }
-  }
-
-  // Protect /accounting - requires executive or owner
-  if (pathname.startsWith("/accounting")) {
-    if (!token) {
-      return NextResponse.redirect(new URL("/", request.url));
-    }
-    if (!EXEC_ROLES.includes(token.role as string)) {
-      return NextResponse.redirect(new URL("/profile", request.url));
-    }
-  }
-
-  // Protect /calendar - requires contractor+ (any team member)
-  if (pathname.startsWith("/calendar")) {
-    if (!token) {
-      return NextResponse.redirect(new URL("/", request.url));
-    }
-    if (!TEAM_ROLES.includes(token.role as string)) {
-      return NextResponse.redirect(new URL("/profile", request.url));
-    }
-  }
-
-  // Protect /boards - requires contractor+ (team)
-  if (pathname.startsWith("/boards")) {
-    if (!token) {
-      return NextResponse.redirect(new URL("/", request.url));
-    }
-    if (!TEAM_ROLES.includes(token.role as string)) {
-      return NextResponse.redirect(new URL("/profile", request.url));
-    }
-  }
-
-  // Protect /requests - requires contractor+ (team)
-  if (pathname.startsWith("/requests")) {
-    if (!token) {
-      return NextResponse.redirect(new URL("/", request.url));
-    }
-    if (!TEAM_ROLES.includes(token.role as string)) {
-      return NextResponse.redirect(new URL("/profile", request.url));
-    }
-  }
-
-  // Protect /tickets - requires authentication
-  if (pathname.startsWith("/tickets")) {
-    if (!token) {
-      return NextResponse.redirect(new URL("/", request.url));
+  // Role-gated routes
+  for (const [route, roles] of Object.entries(PAGE_ROLES)) {
+    if (pathname.startsWith(route)) {
+      if (!token) return NextResponse.redirect(new URL("/", request.url));
+      if (!roles.includes(token.role as string)) {
+        return NextResponse.redirect(new URL("/profile", request.url));
+      }
+      return NextResponse.next();
     }
   }
 

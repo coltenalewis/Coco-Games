@@ -206,30 +206,42 @@ export default async function Home() {
             </p>
           </div>
 
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-2 sm:gap-4 mb-6 sm:mb-8">
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2 sm:gap-3 mb-6 sm:mb-8">
             {[
+              {
+                category: "question",
+                label: "Question",
+                desc: "Ask us anything about Coco Games",
+                icon: "M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z",
+              },
+              {
+                category: "bug_report",
+                label: "Bug Report",
+                desc: "Report a bug in one of our games",
+                icon: "M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z",
+              },
+              {
+                category: "game_report",
+                label: "Game Report",
+                desc: "Report hacking or player violations",
+                icon: "M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z",
+              },
               {
                 category: "discord_appeal",
                 label: "Discord Appeal",
-                desc: "Appeal a ban or mute from our Discord servers",
+                desc: "Appeal a Discord ban or mute",
                 icon: "M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728L5.636 5.636m12.728 12.728A9 9 0 015.636 5.636",
               },
               {
                 category: "game_appeal",
                 label: "Game Appeal",
-                desc: "Appeal a ban or punishment in one of our games",
+                desc: "Appeal a game punishment",
                 icon: "M11 4a2 2 0 114 0v1a1 1 0 001 1h3a1 1 0 011 1v3a1 1 0 01-1 1h-1a2 2 0 100 4h1a1 1 0 011 1v3a1 1 0 01-1 1h-3a1 1 0 01-1-1v-1a2 2 0 10-4 0v1a1 1 0 01-1 1H7a1 1 0 01-1-1v-3a1 1 0 00-1-1H4a2 2 0 110-4h1a1 1 0 001-1V7a1 1 0 011-1h3a1 1 0 001-1V4z",
-              },
-              {
-                category: "question",
-                label: "Question",
-                desc: "Ask us anything about Coco Games or our community",
-                icon: "M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z",
               },
               {
                 category: "business",
                 label: "Business",
-                desc: "Partnerships, collaborations, or business proposals",
+                desc: "Partnerships and proposals",
                 icon: "M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z",
               },
             ].map((item) => (

@@ -52,7 +52,7 @@ const commands = [
     .addUserOption((opt) =>
       opt.setName("user").setDescription("The Discord user to look up").setRequired(true)
     )
-    .setDefaultMemberPermissions(PermissionFlagsBits.ManageMembers),
+    .setDefaultMemberPermissions(PermissionFlagsBits.Administrator),
 
   new SlashCommandBuilder()
     .setName("link-roblox")
@@ -63,7 +63,7 @@ const commands = [
     .addStringOption((opt) =>
       opt.setName("roblox_id").setDescription("The Roblox user ID to link").setRequired(true)
     )
-    .setDefaultMemberPermissions(PermissionFlagsBits.ManageMembers),
+    .setDefaultMemberPermissions(PermissionFlagsBits.Administrator),
 
   new SlashCommandBuilder()
     .setName("unlink-roblox")
@@ -71,7 +71,7 @@ const commands = [
     .addUserOption((opt) =>
       opt.setName("user").setDescription("The Discord user").setRequired(true)
     )
-    .setDefaultMemberPermissions(PermissionFlagsBits.ManageMembers),
+    .setDefaultMemberPermissions(PermissionFlagsBits.Administrator),
 
   new SlashCommandBuilder()
     .setName("set-role")
@@ -88,6 +88,7 @@ const commands = [
           { name: "User", value: "user" },
           { name: "Contractor", value: "contractor" },
           { name: "Mod", value: "mod" },
+          { name: "Coordinator", value: "coordinator" },
           { name: "Developer", value: "developer" },
           { name: "Admin", value: "admin" },
           { name: "Executive", value: "executive" },
@@ -493,6 +494,7 @@ client.on("interactionCreate", async (interaction) => {
       user: 0x9ca3af,
       contractor: 0xf59e0b,
       mod: 0x3b82f6,
+      coordinator: 0x06b6d4,
       developer: 0x8b5cf6,
       admin: 0xef4444,
       executive: 0x22c55e,
@@ -514,6 +516,21 @@ client.on("interactionCreate", async (interaction) => {
     await interaction.deferReply();
 
     const targetUser = interaction.options.getUser("user");
+
+    // Non-admins can only update themselves
+    if (targetUser.id !== interaction.user.id) {
+      const { data: caller } = await supabase
+        .from("users")
+        .select("role")
+        .eq("discord_id", interaction.user.id)
+        .maybeSingle();
+
+      const adminRoles = ["admin", "developer", "executive", "owner"];
+      if (!caller || !adminRoles.includes(caller.role)) {
+        return interaction.editReply("❌ You can only update your own account. Admins can update other users.");
+      }
+    }
+
     const changes = [];
 
     // Fetch DB user

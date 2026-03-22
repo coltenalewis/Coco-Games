@@ -3,15 +3,7 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { getSupabase } from "@/lib/supabase";
 import { isStaff } from "@/lib/roles";
-
-// Determine which ticket categories a role can view
-function getAllowedCategories(role: string | undefined): string[] | null {
-  if (!role) return null; // non-staff, only own tickets
-  if (role === "owner" || role === "executive") return null; // see everything
-  if (role === "admin") return null; // admins see everything
-  if (role === "mod") return ["discord_appeal", "game_appeal", "question"]; // mods can't see business
-  return null;
-}
+import { getTicketCategories } from "@/lib/permissions";
 
 // GET /api/tickets?status=open&page=1
 export async function GET(req: NextRequest) {
@@ -37,9 +29,9 @@ export async function GET(req: NextRequest) {
   if (!staff) {
     query = query.eq("user_discord_id", session.user.discordId);
   } else {
-    // Staff: filter by allowed categories based on role
-    const allowed = getAllowedCategories(session.user.role);
-    if (allowed) {
+    // Staff: filter by allowed categories from permissions config
+    const allowed = await getTicketCategories(session.user.role);
+    if (allowed.length > 0) {
       query = query.in("category", allowed);
     }
   }
@@ -78,12 +70,11 @@ export async function POST(req: NextRequest) {
     );
   }
 
-  const validCategories = ["discord_appeal", "game_appeal", "question", "business"];
+  const validCategories = ["discord_appeal", "game_appeal", "question", "business", "bug_report", "game_report"];
   const ticketCategory = validCategories.includes(category) ? category : "question";
 
   const supabase = getSupabase();
 
-  // Create ticket
   const { data: ticket, error: ticketError } = await supabase
     .from("tickets")
     .insert({
@@ -102,7 +93,6 @@ export async function POST(req: NextRequest) {
     );
   }
 
-  // Create initial message
   const { error: msgError } = await supabase.from("ticket_messages").insert({
     ticket_id: ticket.id,
     author_discord_id: session.user.discordId,

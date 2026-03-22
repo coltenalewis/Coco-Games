@@ -10,7 +10,7 @@ export interface Database {
           roblox_id: string | null;
           roblox_username: string | null;
           is_owner: boolean;
-          role: "owner" | "executive" | "admin" | "developer" | "mod" | "contractor" | "user";
+          role: "owner" | "executive" | "admin" | "developer" | "coordinator" | "mod" | "contractor" | "user";
           created_at: string;
           updated_at: string;
         };
@@ -22,7 +22,7 @@ export interface Database {
           roblox_id?: string | null;
           roblox_username?: string | null;
           is_owner?: boolean;
-          role?: "owner" | "executive" | "admin" | "developer" | "mod" | "contractor" | "user";
+          role?: "owner" | "executive" | "admin" | "developer" | "coordinator" | "mod" | "contractor" | "user";
           created_at?: string;
           updated_at?: string;
         };
@@ -34,7 +34,7 @@ export interface Database {
           roblox_id?: string | null;
           roblox_username?: string | null;
           is_owner?: boolean;
-          role?: "owner" | "executive" | "admin" | "developer" | "mod" | "contractor" | "user";
+          role?: "owner" | "executive" | "admin" | "developer" | "coordinator" | "mod" | "contractor" | "user";
           updated_at?: string;
         };
       };
@@ -85,7 +85,7 @@ export interface Database {
           id: string;
           user_discord_id: string;
           subject: string;
-          category: "discord_appeal" | "game_appeal" | "question" | "business";
+          category: "discord_appeal" | "game_appeal" | "question" | "business" | "bug_report" | "game_report";
           status: "open" | "in_progress" | "closed";
           priority: "low" | "normal" | "high" | "urgent";
           assigned_to: string | null;
@@ -97,7 +97,7 @@ export interface Database {
           id?: string;
           user_discord_id: string;
           subject: string;
-          category?: "discord_appeal" | "game_appeal" | "question" | "business";
+          category?: "discord_appeal" | "game_appeal" | "question" | "business" | "bug_report" | "game_report";
           status?: "open" | "in_progress" | "closed";
           priority?: "low" | "normal" | "high" | "urgent";
           assigned_to?: string | null;
@@ -107,7 +107,7 @@ export interface Database {
         };
         Update: {
           subject?: string;
-          category?: "discord_appeal" | "game_appeal" | "question" | "business";
+          category?: "discord_appeal" | "game_appeal" | "question" | "business" | "bug_report" | "game_report";
           status?: "open" | "in_progress" | "closed";
           priority?: "low" | "normal" | "high" | "urgent";
           assigned_to?: string | null;

@@ -36,14 +36,16 @@ export async function GET(
     return NextResponse.json({ error: "Forbidden" }, { status: 403 });
   }
 
-  // Mods can't view business tickets
+  // Check if staff can view this ticket category via permissions
   if (
     isStaff(session.user.role) &&
-    ticket.category === "business" &&
-    session.user.role !== "executive" && session.user.role !== "owner" &&
     ticket.user_discord_id !== session.user.discordId
   ) {
-    return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    const { getTicketCategories } = await import("@/lib/permissions");
+    const allowed = await getTicketCategories(session.user.role);
+    if (!allowed.includes(ticket.category)) {
+      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    }
   }
 
   // Fetch the ticket creator's username

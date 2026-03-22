@@ -40,6 +40,8 @@ interface Card {
   labels: Label[];
   assignees: Assignee[];
   due_date: string | null;
+  checklistTotal: number;
+  checklistDone: number;
   checklists: Checklist[];
   card_type: string;
 }
@@ -92,7 +94,8 @@ export default function BoardDetailPage() {
         // Restructure: nest cards into their lists
         const rawLists = (json.lists || []) as { id: string; name: string; position: number }[];
         const rawCards = (json.cards || []) as { id: string; list_id: string; title: string; description: string | null; position: number; due_date: string | null; card_type: string; priority: string }[];
-        const rawAssignees = (json.assignees || []) as { card_id: string; discord_id: string }[];
+        const rawAssignees = (json.assignees || []) as { card_id: string; discord_id: string; username?: string; avatar?: string | null }[];
+        const checklistProgress = (json.checklistProgress || {}) as Record<string, { total: number; done: number }>;
         const rawLabels = (json.labels || []) as Label[];
         const rawCardLabels = (json.cardLabels || []) as { card_id: string; label_id: string }[];
 
@@ -114,7 +117,13 @@ export default function BoardDetailPage() {
                   .filter(Boolean) as Label[],
                 assignees: rawAssignees
                   .filter((a) => a.card_id === card.id)
-                  .map((a) => ({ discord_id: a.discord_id, username: a.discord_id, avatar: null })),
+                  .map((a) => ({
+                    discord_id: a.discord_id,
+                    username: a.username || a.discord_id,
+                    avatar: a.avatar ? `https://cdn.discordapp.com/avatars/${a.discord_id}/${a.avatar}.png?size=64` : null,
+                  })),
+                checklistTotal: checklistProgress[card.id]?.total || 0,
+                checklistDone: checklistProgress[card.id]?.done || 0,
                 checklists: [],
               })),
           }));
@@ -224,16 +233,15 @@ export default function BoardDetailPage() {
     }
   };
 
-  const getChecklistProgress = (checklists: Checklist[]) => {
-    let total = 0;
-    let done = 0;
-    for (const cl of checklists) {
-      for (const item of cl.items) {
-        total++;
-        if (item.completed) done++;
-      }
-    }
-    return { total, done };
+  // Delete list handler
+  const handleDeleteList = async (listId: string) => {
+    if (!confirm("Delete this list and archive all its cards?")) return;
+    await fetch(`/api/boards/${boardId}/lists`, {
+      method: "DELETE",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ listId }),
+    });
+    fetchBoard();
   };
 
   if (loading) {
@@ -296,13 +304,24 @@ export default function BoardDetailPage() {
                   className="w-72 sm:w-80 flex-shrink-0 flex flex-col bg-[#252538] border border-[#2a2a3d] rounded-sm max-h-[calc(100vh-160px)]"
                 >
                   {/* List Header */}
-                  <div className="px-3 py-2.5 border-b border-[#2a2a3d] flex-shrink-0">
-                    <h3 className="text-xs font-bold text-gray-300 uppercase tracking-wider">
-                      {list.name}
-                    </h3>
-                    <span className="text-[10px] text-gray-500">
-                      {list.cards.length} card{list.cards.length !== 1 ? "s" : ""}
-                    </span>
+                  <div className="px-3 py-2.5 border-b border-[#2a2a3d] flex-shrink-0 flex items-center justify-between">
+                    <div>
+                      <h3 className="text-xs font-bold text-gray-300 uppercase tracking-wider">
+                        {list.name}
+                      </h3>
+                      <span className="text-[10px] text-gray-500">
+                        {list.cards.length} card{list.cards.length !== 1 ? "s" : ""}
+                      </span>
+                    </div>
+                    <button
+                      onClick={() => handleDeleteList(list.id)}
+                      className="w-7 h-7 flex items-center justify-center text-gray-600 hover:text-red-400 transition-colors rounded-sm hover:bg-red-500/10"
+                      title="Delete list"
+                    >
+                      <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
+                        <path strokeLinecap="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                      </svg>
+                    </button>
                   </div>
 
                   {/* Cards */}
@@ -318,7 +337,6 @@ export default function BoardDetailPage() {
                         {list.cards
                           .sort((a, b) => a.position - b.position)
                           .map((card, index) => {
-                            const progress = getChecklistProgress(card.checklists);
                             return (
                               <Draggable
                                 key={card.id}
@@ -384,15 +402,16 @@ export default function BoardDetailPage() {
                                         );
                                       })()}
 
-                                      {progress.total > 0 && (
+                                      {card.checklistTotal > 0 && (
                                         <span
-                                          className={`text-[10px] font-bold px-1.5 py-0.5 ${
-                                            progress.done === progress.total
-                                              ? "bg-green-100 text-green-700"
-                                              : "bg-coco-cream text-coco-coffee/60"
+                                          className={`text-[9px] font-bold px-1.5 py-0.5 flex items-center gap-1 ${
+                                            card.checklistDone === card.checklistTotal
+                                              ? "bg-green-500/20 text-green-400"
+                                              : "bg-[#2a2a3d] text-gray-400"
                                           }`}
                                         >
-                                          {progress.done}/{progress.total}
+                                          <svg className="w-2.5 h-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2.5}><path d="M5 13l4 4L19 7" /></svg>
+                                          {card.checklistDone}/{card.checklistTotal}
                                         </span>
                                       )}
 

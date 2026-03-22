@@ -17,8 +17,10 @@ interface Ticket {
 
 const categoryLabels: Record<string, { text: string; color: string }> = {
   discord_appeal: { text: "DISCORD", color: "bg-indigo-100 text-indigo-700 border-indigo-300" },
-  game_appeal: { text: "GAME", color: "bg-purple-100 text-purple-700 border-purple-300" },
+  game_appeal: { text: "GAME APPEAL", color: "bg-purple-100 text-purple-700 border-purple-300" },
   question: { text: "QUESTION", color: "bg-cyan-100 text-cyan-700 border-cyan-300" },
+  bug_report: { text: "BUG", color: "bg-orange-100 text-orange-700 border-orange-300" },
+  game_report: { text: "REPORT", color: "bg-red-100 text-red-700 border-red-300" },
   business: { text: "BUSINESS", color: "bg-emerald-100 text-emerald-700 border-emerald-300" },
 };
 
