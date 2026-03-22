@@ -5,6 +5,7 @@ import Link from "next/link";
 
 interface Ticket {
   id: string;
+  ticket_number: number;
   subject: string;
   category: string;
   status: string;
@@ -18,6 +19,8 @@ const categoryLabels: Record<string, { text: string; color: string }> = {
   game_appeal: { text: "GAME APPEAL", color: "bg-purple-100 text-purple-700 border-purple-300" },
   question: { text: "QUESTION", color: "bg-cyan-100 text-cyan-700 border-cyan-300" },
   business: { text: "BUSINESS", color: "bg-emerald-100 text-emerald-700 border-emerald-300" },
+  bug_report: { text: "BUG", color: "bg-orange-100 text-orange-700 border-orange-300" },
+  game_report: { text: "REPORT", color: "bg-red-100 text-red-700 border-red-300" },
 };
 
 const statusColors: Record<string, string> = {
@@ -133,7 +136,12 @@ export default function TicketsPage() {
                       {categoryLabels[ticket.category].text}
                     </span>
                   )}
-                  <h3 className="font-bold text-coco-dark">{ticket.subject}</h3>
+                  <h3 className="font-bold text-coco-dark">
+                    <span className="text-coco-coffee/50 font-mono text-xs mr-1.5">
+                      #{ticket.ticket_number}
+                    </span>
+                    {ticket.subject}
+                  </h3>
                 </div>
                 <div className="flex items-center gap-4 text-xs">
                   <span

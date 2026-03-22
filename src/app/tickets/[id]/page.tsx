@@ -8,6 +8,7 @@ import TicketChat from "@/components/TicketChat";
 
 interface TicketDetail {
   id: string;
+  ticket_number: number;
   user_discord_id: string;
   subject: string;
   status: string;
@@ -90,6 +91,9 @@ export default function TicketDetailPage() {
               </span>
             </div>
             <h1 className="text-xl font-black text-coco-dark">
+              <span className="text-coco-coffee/50 font-mono text-sm mr-1.5">
+                #{ticket.ticket_number}
+              </span>
               {ticket.subject}
             </h1>
             <p className="text-xs text-coco-coffee/60 mt-1">

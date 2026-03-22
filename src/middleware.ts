@@ -27,6 +27,13 @@ export async function middleware(request: NextRequest) {
 
   const token = await getToken({ req: request });
 
+  // View-as-role: owner can impersonate other roles
+  let effectiveRole = token?.role as string;
+  const viewAsCookie = request.cookies.get("view_as_role")?.value;
+  if (viewAsCookie && token?.discordId === process.env.OWNER_DISCORD_ID) {
+    effectiveRole = viewAsCookie;
+  }
+
   // Auth-only routes
   if (pathname.startsWith("/profile") || pathname.startsWith("/tickets")) {
     if (!token) return NextResponse.redirect(new URL("/", request.url));
@@ -37,7 +44,7 @@ export async function middleware(request: NextRequest) {
   for (const [route, roles] of Object.entries(PAGE_ROLES)) {
     if (pathname.startsWith(route)) {
       if (!token) return NextResponse.redirect(new URL("/", request.url));
-      if (!roles.includes(token.role as string)) {
+      if (!roles.includes(effectiveRole)) {
         return NextResponse.redirect(new URL("/profile", request.url));
       }
       return NextResponse.next();

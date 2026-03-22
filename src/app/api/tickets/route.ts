@@ -5,7 +5,7 @@ import { getSupabase } from "@/lib/supabase";
 import { isStaff } from "@/lib/roles";
 import { getTicketCategories } from "@/lib/permissions";
 
-// GET /api/tickets?status=open&page=1
+// GET /api/tickets?status=open&page=1&server=General
 export async function GET(req: NextRequest) {
   const session = await getServerSession(authOptions);
   if (!session?.user?.discordId) {
@@ -14,6 +14,7 @@ export async function GET(req: NextRequest) {
 
   const { searchParams } = new URL(req.url);
   const status = searchParams.get("status");
+  const server = searchParams.get("server");
   const page = parseInt(searchParams.get("page") || "1", 10);
   const limit = 20;
   const offset = (page - 1) * limit;
@@ -40,6 +41,10 @@ export async function GET(req: NextRequest) {
     query = query.eq("status", status);
   }
 
+  if (server && server !== "all") {
+    query = query.eq("server_name", server);
+  }
+
   const { data, error, count } = await query;
 
   if (error) {
@@ -61,7 +66,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  const { subject, category, priority, message, imageUrl } = await req.json();
+  const { subject, category, priority, message, imageUrl, server_name } = await req.json();
 
   if (!subject?.trim() || !message?.trim()) {
     return NextResponse.json(
@@ -82,8 +87,9 @@ export async function POST(req: NextRequest) {
       subject: subject.trim(),
       category: ticketCategory,
       priority: priority || "normal",
+      server_name: server_name || "General",
     })
-    .select("id")
+    .select("id, ticket_number")
     .single();
 
   if (ticketError || !ticket) {
@@ -104,5 +110,5 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: msgError.message }, { status: 500 });
   }
 
-  return NextResponse.json({ id: ticket.id }, { status: 201 });
+  return NextResponse.json({ id: ticket.id, ticket_number: ticket.ticket_number }, { status: 201 });
 }

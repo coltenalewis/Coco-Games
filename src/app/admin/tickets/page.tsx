@@ -5,12 +5,14 @@ import Link from "next/link";
 
 interface Ticket {
   id: string;
+  ticket_number: number;
   user_discord_id: string;
   subject: string;
   category: string;
   status: string;
   priority: string;
   assigned_to: string | null;
+  server_name: string;
   created_at: string;
   updated_at: string;
 }
@@ -41,6 +43,7 @@ export default function AdminTicketsPage() {
   const [tickets, setTickets] = useState<Ticket[]>([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState("all");
+  const [serverFilter, setServerFilter] = useState("all");
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [total, setTotal] = useState(0);
@@ -48,7 +51,11 @@ export default function AdminTicketsPage() {
   const fetchTickets = useCallback(async () => {
     setLoading(true);
     try {
-      const res = await fetch(`/api/tickets?status=${filter}&page=${page}`);
+      const params = new URLSearchParams({ status: filter, page: String(page) });
+      if (serverFilter !== "all") {
+        params.set("server", serverFilter);
+      }
+      const res = await fetch(`/api/tickets?${params.toString()}`);
       if (res.ok) {
         const data = await res.json();
         setTickets(data.tickets || []);
@@ -60,7 +67,7 @@ export default function AdminTicketsPage() {
     } finally {
       setLoading(false);
     }
-  }, [filter, page]);
+  }, [filter, serverFilter, page]);
 
   useEffect(() => {
     fetchTickets();
@@ -77,8 +84,8 @@ export default function AdminTicketsPage() {
         </div>
       </div>
 
-      {/* Filters */}
-      <div className="flex gap-2">
+      {/* Status Filters */}
+      <div className="flex flex-wrap gap-2">
         {["all", "open", "in_progress", "closed"].map((s) => (
           <button
             key={s}
@@ -95,6 +102,26 @@ export default function AdminTicketsPage() {
             {s === "in_progress"
               ? "In Progress"
               : s.charAt(0).toUpperCase() + s.slice(1)}
+          </button>
+        ))}
+      </div>
+
+      {/* Server Filters */}
+      <div className="flex flex-wrap gap-2">
+        {["all", "General", "Country Conquesters", "Discord Server"].map((s) => (
+          <button
+            key={s}
+            onClick={() => {
+              setServerFilter(s);
+              setPage(1);
+            }}
+            className={`px-3 py-1.5 text-xs font-bold uppercase tracking-wider border-2 transition-all ${
+              serverFilter === s
+                ? "bg-coco-dark text-coco-gold border-coco-dark"
+                : "bg-white text-coco-dark border-coco-dark/15 hover:border-coco-accent"
+            }`}
+          >
+            {s === "all" ? "All Servers" : s}
           </button>
         ))}
       </div>
@@ -122,6 +149,9 @@ export default function AdminTicketsPage() {
                 </th>
                 <th className="text-left px-4 py-3 text-xs font-bold text-coco-accent uppercase tracking-wider">
                   Category
+                </th>
+                <th className="text-left px-4 py-3 text-xs font-bold text-coco-accent uppercase tracking-wider">
+                  Server
                 </th>
                 <th className="text-left px-4 py-3 text-xs font-bold text-coco-accent uppercase tracking-wider">
                   User
@@ -153,6 +183,9 @@ export default function AdminTicketsPage() {
                     </span>
                   </td>
                   <td className="px-4 py-3 font-medium text-coco-dark">
+                    <span className="text-coco-coffee/50 font-mono text-xs mr-1.5">
+                      #{ticket.ticket_number}
+                    </span>
                     {ticket.subject}
                   </td>
                   <td className="px-4 py-3">
@@ -165,8 +198,11 @@ export default function AdminTicketsPage() {
                         {categoryLabels[ticket.category].text}
                       </span>
                     ) : (
-                      <span className="text-xs text-coco-coffee/40">—</span>
+                      <span className="text-xs text-coco-coffee/40">&mdash;</span>
                     )}
+                  </td>
+                  <td className="px-4 py-3 text-xs text-coco-coffee/70">
+                    {ticket.server_name || "General"}
                   </td>
                   <td className="px-4 py-3 font-mono text-xs text-coco-coffee/70">
                     {ticket.user_discord_id}

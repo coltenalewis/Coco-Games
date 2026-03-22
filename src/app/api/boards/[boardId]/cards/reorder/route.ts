@@ -4,7 +4,6 @@ import { authOptions } from "@/lib/auth";
 import { getSupabase } from "@/lib/supabase";
 import { isTeam } from "@/lib/roles";
 
-// PATCH /api/boards/[boardId]/cards/reorder - move a card
 export async function PATCH(
   req: NextRequest,
   { params }: { params: { boardId: string } }
@@ -22,10 +21,10 @@ export async function PATCH(
 
   const supabase = getSupabase();
 
-  // Get the card's current list
+  // Get card's current list
   const { data: card } = await supabase
     .from("cards")
-    .select("list_id")
+    .select("list_id, position")
     .eq("id", cardId)
     .eq("board_id", params.boardId)
     .maybeSingle();
@@ -34,39 +33,29 @@ export async function PATCH(
 
   const sourceListId = card.list_id;
 
-  // Move the card
-  const { error } = await supabase
-    .from("cards")
-    .update({ list_id: targetListId, position: newPosition })
-    .eq("id", cardId);
+  // Update the card's list and position
+  await supabase.from("cards").update({ list_id: targetListId, position: newPosition }).eq("id", cardId);
 
-  if (error) return NextResponse.json({ error: error.message }, { status: 500 });
-
-  // Re-index positions in the target list
+  // Re-index ALL cards in the target list in the correct order
   const { data: targetCards } = await supabase
     .from("cards")
     .select("id")
     .eq("list_id", targetListId)
     .eq("board_id", params.boardId)
     .eq("archived", false)
-    .neq("id", cardId)
-    .order("position");
+    .order("position")
+    .order("updated_at", { ascending: false });
 
   if (targetCards) {
-    const reordered = [
-      ...targetCards.slice(0, newPosition).map((c: { id: string }) => c.id),
-      cardId,
-      ...targetCards.slice(newPosition).map((c: { id: string }) => c.id),
-    ];
-    for (let i = 0; i < reordered.length; i++) {
-      await supabase
-        .from("cards")
-        .update({ position: i })
-        .eq("id", reordered[i]);
+    // Put the moved card at the right position, others around it
+    const others = targetCards.filter((c: { id: string }) => c.id !== cardId).map((c: { id: string }) => c.id);
+    const final = [...others.slice(0, newPosition), cardId, ...others.slice(newPosition)];
+    for (let i = 0; i < final.length; i++) {
+      await supabase.from("cards").update({ position: i }).eq("id", final[i]);
     }
   }
 
-  // Re-index source list if different
+  // Re-index source list if moved between lists
   if (sourceListId !== targetListId) {
     const { data: sourceCards } = await supabase
       .from("cards")
@@ -78,10 +67,7 @@ export async function PATCH(
 
     if (sourceCards) {
       for (let i = 0; i < sourceCards.length; i++) {
-        await supabase
-          .from("cards")
-          .update({ position: i })
-          .eq("id", sourceCards[i].id);
+        await supabase.from("cards").update({ position: i }).eq("id", sourceCards[i].id);
       }
     }
   }

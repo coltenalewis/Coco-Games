@@ -48,20 +48,40 @@ export async function GET(
   const authorIds = Array.from(new Set((messages || []).map((m) => m.author_discord_id)));
   const { data: authors } = await supabase
     .from("users")
-    .select("discord_id, discord_username, discord_avatar, role")
+    .select("discord_id, discord_username, discord_avatar, role, roblox_username")
     .in("discord_id", authorIds);
 
   const authorMap = new Map(
     (authors || []).map((a) => [a.discord_id, a])
   );
 
+  // Fetch staff tags from site_permissions
+  const { data: tagPerms } = await supabase
+    .from("site_permissions")
+    .select("permission_key, permission_label")
+    .like("permission_key", "tag.%");
+
+  const tagMap = new Map<string, string>();
+  (tagPerms || []).forEach((perm) => {
+    // permission_key format: "tag.{role}"
+    const role = perm.permission_key.replace("tag.", "");
+    tagMap.set(role, perm.permission_label);
+  });
+
   const enrichedMessages = (messages || []).map((msg) => {
     const author = authorMap.get(msg.author_discord_id);
+    const authorRole = author?.role || "user";
+    const staffMember = authorRole !== "user";
+    const staffTag = staffMember ? tagMap.get(authorRole) || null : null;
+
     return {
       ...msg,
       author_username: author?.discord_username || "Unknown",
       author_avatar: author?.discord_avatar || null,
-      author_role: author?.role || "user",
+      author_role: authorRole,
+      author_roblox_username: author?.roblox_username || null,
+      is_staff: staffMember,
+      staff_tag: staffTag,
     };
   });
 

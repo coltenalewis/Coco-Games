@@ -166,7 +166,7 @@ export default function BoardDetailPage() {
     setData({ ...data, lists: newLists });
 
     try {
-      await fetch(`/api/boards/${boardId}/cards/reorder`, {
+      const res = await fetch(`/api/boards/${boardId}/cards/reorder`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -175,6 +175,10 @@ export default function BoardDetailPage() {
           newPosition: destination.index,
         }),
       });
+      if (!res.ok) {
+        console.error("Reorder failed:", await res.text());
+        fetchBoard(); // Revert on error
+      }
     } catch {
       fetchBoard();
     }

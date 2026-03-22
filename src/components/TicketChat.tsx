@@ -12,6 +12,9 @@ interface Message {
   author_username: string;
   author_avatar: string | null;
   author_role: string;
+  author_roblox_username: string | null;
+  is_staff: boolean;
+  staff_tag: string | null;
 }
 
 interface TicketChatProps {
@@ -129,6 +132,7 @@ export default function TicketChat({
     return `https://cdn.discordapp.com/embed/avatars/${idx}.png`;
   };
 
+
   return (
     <div className="flex flex-col h-full">
       {/* Messages */}
@@ -157,10 +161,22 @@ export default function TicketChat({
                   }`}
                 >
                   <div className="flex items-center gap-2 mb-1">
-                    <span className="text-xs font-bold text-coco-dark">
-                      {msg.author_username}
-                    </span>
-                    {badge && (
+                    {msg.is_staff && msg.staff_tag ? (
+                      <span
+                        className={`text-[9px] font-bold px-1.5 py-0.5 ${
+                          badge || "bg-blue-100 text-blue-700"
+                        }`}
+                      >
+                        {msg.staff_tag}
+                      </span>
+                    ) : (
+                      <span className="text-xs font-bold text-coco-dark">
+                        {msg.author_roblox_username
+                          ? `${msg.author_username} (${msg.author_roblox_username})`
+                          : msg.author_username}
+                      </span>
+                    )}
+                    {!msg.is_staff && badge && (
                       <span
                         className={`text-[9px] font-bold px-1.5 py-0.5 ${badge}`}
                       >

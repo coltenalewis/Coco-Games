@@ -15,6 +15,7 @@ function NewTicketForm() {
     validCategories.includes(initialCategory) ? initialCategory : "question"
   );
   const [priority] = useState("normal");
+  const [serverName, setServerName] = useState("General");
   const [message, setMessage] = useState("");
   const [imageUrl, setImageUrl] = useState<string | null>(null);
   const [uploading, setUploading] = useState(false);
@@ -62,7 +63,7 @@ function NewTicketForm() {
       const res = await fetch("/api/tickets", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ subject, category, priority, message, imageUrl }),
+        body: JSON.stringify({ subject, category, priority, message, imageUrl, server_name: serverName }),
       });
 
       if (res.ok) {
@@ -147,6 +148,22 @@ function NewTicketForm() {
               </button>
             ))}
           </div>
+        </div>
+
+        {/* Server / Game */}
+        <div>
+          <label className="block text-xs font-bold text-coco-coffee uppercase tracking-wider mb-1.5">
+            Server / Game
+          </label>
+          <select
+            value={serverName}
+            onChange={(e) => setServerName(e.target.value)}
+            className="w-full px-4 py-2.5 border-2 border-coco-dark/10 bg-white text-coco-dark text-sm focus:outline-none focus:border-coco-accent transition-colors"
+          >
+            <option value="General">General</option>
+            <option value="Country Conquesters">Country Conquesters</option>
+            <option value="Discord Server">Discord Server</option>
+          </select>
         </div>
 
         {/* Message */}

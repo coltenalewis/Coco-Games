@@ -57,6 +57,8 @@ export async function GET(
 
   return NextResponse.json({
     ...ticket,
+    ticket_number: ticket.ticket_number,
+    server_name: ticket.server_name,
     creator_username: creator?.discord_username || "Unknown",
     creator_avatar: creator?.discord_avatar || null,
   });

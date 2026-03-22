@@ -6,6 +6,7 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import FloatingParticles from "@/components/FloatingParticles";
 import MouseGlow from "@/components/MouseGlow";
+import ViewAsRole from "@/components/ViewAsRole";
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
@@ -34,6 +35,7 @@ export default function RootLayout({
         <Providers>
           <FloatingParticles />
           <MouseGlow />
+          <ViewAsRole />
           <div className="flex flex-col min-h-screen relative z-10">
             <Navbar />
             <main className="flex-1">{children}</main>

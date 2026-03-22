@@ -8,12 +8,14 @@ import TicketChat from "@/components/TicketChat";
 
 interface TicketDetail {
   id: string;
+  ticket_number: number;
   user_discord_id: string;
   subject: string;
   category: string;
   status: string;
   priority: string;
   assigned_to: string | null;
+  server_name: string;
   created_at: string;
   updated_at: string;
   closed_at: string | null;
@@ -140,8 +142,16 @@ export default function AdminTicketDetailPage() {
               <span className="text-[10px] font-bold text-coco-coffee/30 uppercase">
                 {ticket.category.replace("_", " ")}
               </span>
+              {ticket.server_name && (
+                <span className="text-[10px] font-bold text-coco-accent/70 uppercase">
+                  {ticket.server_name}
+                </span>
+              )}
             </div>
             <h1 className="text-lg sm:text-xl font-black text-coco-dark">
+              <span className="text-coco-coffee/50 font-mono text-sm mr-1.5">
+                #{ticket.ticket_number}
+              </span>
               {ticket.subject}
             </h1>
             <p className="text-[10px] sm:text-xs text-coco-coffee/60 mt-1">

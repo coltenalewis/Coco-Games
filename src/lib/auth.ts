@@ -91,6 +91,9 @@ export const authOptions: NextAuthOptions = {
         session.user.role = token.role;
       }
       session.accessToken = token.accessToken;
+      // Note: view-as-role is handled at the middleware level via cookies
+      // API routes should use getServerSession which returns the real role
+      // The middleware overrides route access only
       return session;
     },
   },
