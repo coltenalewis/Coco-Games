@@ -149,16 +149,33 @@ export async function POST(
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
 
-  // Auto-set ticket to in_progress if staff replies to an open ticket
+  // Staff reply handling
   if (
     isStaff(session.user.role) &&
-    ticket.status === "open" &&
     ticket.user_discord_id !== session.user.discordId
   ) {
-    await supabase
+    const updates: Record<string, unknown> = {};
+
+    // Auto-set to in_progress on first staff reply
+    if (ticket.status === "open") {
+      updates.status = "in_progress";
+      updates.assigned_to = session.user.discordId;
+    }
+
+    // Track first response time
+    const { data: fullTicket } = await supabase
       .from("tickets")
-      .update({ status: "in_progress", assigned_to: session.user.discordId })
-      .eq("id", params.id);
+      .select("first_response_at")
+      .eq("id", params.id)
+      .maybeSingle();
+
+    if (!fullTicket?.first_response_at) {
+      updates.first_response_at = new Date().toISOString();
+    }
+
+    if (Object.keys(updates).length > 0) {
+      await supabase.from("tickets").update(updates).eq("id", params.id);
+    }
   }
 
   return NextResponse.json(message, { status: 201 });

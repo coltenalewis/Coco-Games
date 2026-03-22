@@ -100,6 +100,19 @@ export async function PATCH(
     update.assigned_to = body.assigned_to || null;
   }
 
+  // Category escalation
+  if (body.category) {
+    const validCategories = ["discord_appeal", "game_appeal", "question", "business", "bug_report", "game_report"];
+    if (validCategories.includes(body.category)) {
+      update.category = body.category;
+    }
+  }
+
+  // Server change
+  if (body.server_name !== undefined) {
+    update.server_name = body.server_name;
+  }
+
   if (Object.keys(update).length === 0) {
     return NextResponse.json({ error: "No updates provided" }, { status: 400 });
   }

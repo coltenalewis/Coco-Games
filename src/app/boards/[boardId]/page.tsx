@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback } from "react";
 import { useParams } from "next/navigation";
+import { useSession } from "next-auth/react";
 import Link from "next/link";
 import { DragDropContext, Droppable, Draggable } from "@hello-pangea/dnd";
 import type { DropResult } from "@hello-pangea/dnd";
@@ -59,6 +60,8 @@ interface Board {
   description: string | null;
   color: string;
   labels: Label[];
+  view_roles: string[];
+  edit_roles: string[];
 }
 
 interface BoardData {
@@ -67,13 +70,18 @@ interface BoardData {
   canEdit: boolean;
 }
 
+const ALL_ROLES = ["contractor", "mod", "coordinator", "developer", "admin", "executive", "owner"];
+
 export default function BoardDetailPage() {
   const params = useParams();
   const boardId = params.boardId as string;
+  const { data: session } = useSession();
+  const isOwner = session?.user?.role === "owner";
 
   const [data, setData] = useState<BoardData | null>(null);
   const [loading, setLoading] = useState(true);
   const [selectedCardId, setSelectedCardId] = useState<string | null>(null);
+  const [showSettings, setShowSettings] = useState(false);
 
   // Add list state
   const [showAddList, setShowAddList] = useState(false);
@@ -129,7 +137,7 @@ export default function BoardDetailPage() {
           }));
 
         setData({
-          board: { id: json.id, name: json.name, description: json.description, color: json.color, labels: rawLabels },
+          board: { id: json.id, name: json.name, description: json.description, color: json.color, labels: rawLabels, view_roles: json.view_roles || [], edit_roles: json.edit_roles || [] },
           lists,
           canEdit: json.canEdit ?? true,
         });
@@ -318,6 +326,18 @@ export default function BoardDetailPage() {
               <p className="text-xs text-gray-400">{board.description}</p>
             )}
           </div>
+          {isOwner && (
+            <button
+              onClick={() => setShowSettings(true)}
+              className="ml-auto w-8 h-8 flex items-center justify-center text-gray-500 hover:text-coco-accent transition-colors"
+              title="Board Settings"
+            >
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.066 2.573c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.573 1.066c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.066-2.573c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+                <path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+              </svg>
+            </button>
+          )}
         </div>
       </div>
 
@@ -626,6 +646,126 @@ export default function BoardDetailPage() {
           onUpdate={() => fetchBoard()}
         />
       )}
+
+      {/* Board Settings Modal (Owner only) */}
+      {showSettings && isOwner && (
+        <BoardSettingsModal
+          board={board}
+          boardId={boardId}
+          onClose={() => setShowSettings(false)}
+          onUpdate={() => fetchBoard()}
+        />
+      )}
+    </div>
+  );
+}
+
+// ============================================
+// Board Settings Modal
+// ============================================
+function BoardSettingsModal({ board, boardId, onClose, onUpdate }: {
+  board: Board;
+  boardId: string;
+  onClose: () => void;
+  onUpdate: () => void;
+}) {
+  const [name, setName] = useState(board.name);
+  const [description, setDescription] = useState(board.description || "");
+  const [color, setColor] = useState(board.color);
+  const [viewRoles, setViewRoles] = useState<Set<string>>(new Set(board.view_roles || []));
+  const [editRoles, setEditRoles] = useState<Set<string>>(new Set(board.edit_roles || []));
+  const [saving, setSaving] = useState(false);
+
+  const toggleRole = (set: Set<string>, setFn: (s: Set<string>) => void, role: string) => {
+    const next = new Set(set);
+    if (next.has(role)) next.delete(role); else next.add(role);
+    setFn(next);
+  };
+
+  const handleSave = async () => {
+    setSaving(true);
+    try {
+      const res = await fetch(`/api/boards/${boardId}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name: name.trim(),
+          description: description.trim() || null,
+          color,
+          view_roles: Array.from(viewRoles),
+          edit_roles: Array.from(editRoles),
+        }),
+      });
+      if (res.ok) {
+        onUpdate();
+        onClose();
+      }
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const COLORS = ["#E8944A", "#D35400", "#F5B041", "#3498db", "#2ecc71", "#9b59b6", "#e74c3c", "#1abc9c", "#34495e", "#f39c12"];
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60" onClick={onClose}>
+      <div className="bg-[#1e1e2e] border border-[#2a2a3d] shadow-xl w-full max-w-lg max-h-[90vh] overflow-y-auto p-5 sm:p-6 space-y-5" onClick={(e) => e.stopPropagation()}>
+        <h3 className="text-lg font-black text-gray-100">Board Settings</h3>
+
+        <div>
+          <label className="block text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1">Board Name</label>
+          <input type="text" value={name} onChange={(e) => setName(e.target.value)} className="w-full px-3 py-2.5 bg-[#252538] border border-[#2a2a3d] text-gray-200 text-sm focus:outline-none focus:border-coco-accent min-h-[40px]" />
+        </div>
+
+        <div>
+          <label className="block text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1">Description</label>
+          <input type="text" value={description} onChange={(e) => setDescription(e.target.value)} placeholder="What is this board for?" className="w-full px-3 py-2.5 bg-[#252538] border border-[#2a2a3d] text-gray-200 text-sm focus:outline-none focus:border-coco-accent min-h-[40px]" />
+        </div>
+
+        <div>
+          <label className="block text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-2">Color</label>
+          <div className="flex flex-wrap gap-2">
+            {COLORS.map((c) => (
+              <button key={c} onClick={() => setColor(c)} className={`w-8 h-8 rounded-sm border-2 transition-all ${color === c ? "border-white scale-110" : "border-transparent"}`} style={{ background: c }} />
+            ))}
+          </div>
+        </div>
+
+        <div>
+          <label className="block text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-2">Who Can View</label>
+          <div className="flex flex-wrap gap-1.5">
+            {ALL_ROLES.map((r) => (
+              <label key={r} className={`flex items-center gap-1.5 px-2.5 py-1.5 border cursor-pointer text-xs font-bold transition-colors min-h-[36px] ${
+                viewRoles.has(r) ? "border-green-500 bg-green-500/20 text-green-400" : "border-[#2a2a3d] text-gray-500"
+              }`}>
+                <input type="checkbox" checked={viewRoles.has(r)} onChange={() => toggleRole(viewRoles, setViewRoles, r)} className="w-3.5 h-3.5 accent-green-500" />
+                {r}
+              </label>
+            ))}
+          </div>
+        </div>
+
+        <div>
+          <label className="block text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-2">Who Can Edit</label>
+          <div className="flex flex-wrap gap-1.5">
+            {ALL_ROLES.map((r) => (
+              <label key={r} className={`flex items-center gap-1.5 px-2.5 py-1.5 border cursor-pointer text-xs font-bold transition-colors min-h-[36px] ${
+                editRoles.has(r) ? "border-blue-500 bg-blue-500/20 text-blue-400" : "border-[#2a2a3d] text-gray-500"
+              }`}>
+                <input type="checkbox" checked={editRoles.has(r)} onChange={() => toggleRole(editRoles, setEditRoles, r)} className="w-3.5 h-3.5 accent-blue-500" />
+                {r}
+              </label>
+            ))}
+          </div>
+        </div>
+
+        <div className="flex gap-2 justify-end pt-2 border-t border-[#2a2a3d]">
+          <button onClick={onClose} className="px-4 py-2 text-xs font-bold border border-[#2a2a3d] text-gray-400 min-h-[40px]">Cancel</button>
+          <button onClick={handleSave} disabled={saving || !name.trim()} className="btn-primary text-xs !px-4 !py-2 disabled:opacity-50 min-h-[40px]">
+            {saving ? "Saving..." : "Save Settings"}
+          </button>
+        </div>
+      </div>
     </div>
   );
 }
