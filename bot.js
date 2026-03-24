@@ -712,6 +712,52 @@ client.on("guildMemberAdd", async (member) => {
       .eq("discord_id", member.id)
       .maybeSingle();
 
+    // DM unverified users to help them connect their account
+    if (!user?.roblox_id) {
+      try {
+        const dm = await member.createDM();
+        const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://coco-games-ieew.vercel.app";
+
+        const embed = new EmbedBuilder()
+          .setColor(0xe8944a)
+          .setTitle(`\u2615 Welcome to ${member.guild.name}!`)
+          .setDescription(
+            `Hey **${member.user.username}**! Welcome to the **COCO GAMES** community.\n\n` +
+            `To get the **Verified** role and access exclusive channels, connect your accounts on our website:`
+          )
+          .addFields(
+            {
+              name: "\ud83d\udd39 Step 1",
+              value: `[Click here to visit our site](${siteUrl})`,
+              inline: false,
+            },
+            {
+              name: "\ud83d\udd39 Step 2",
+              value: "Sign in with your **Discord** account",
+              inline: false,
+            },
+            {
+              name: "\ud83d\udd39 Step 3",
+              value: "Link your **Roblox** account",
+              inline: false,
+            },
+            {
+              name: "\u2705 Done!",
+              value: "You'll receive the **Verified** role automatically in all COCO GAMES servers.",
+              inline: false,
+            }
+          )
+          .setThumbnail(member.guild.iconURL({ size: 64 }) || "")
+          .setFooter({ text: "COCO GAMES \u2022 Verification" })
+          .setTimestamp();
+
+        await dm.send({ embeds: [embed] });
+        console.log(`[DM] Sent verification DM to ${member.user.tag}`);
+      } catch {
+        // User has DMs disabled
+      }
+    }
+
     if (user?.roblox_id) {
       if (config.verified_role_id) {
         await member.roles.add(config.verified_role_id).catch(() => {});

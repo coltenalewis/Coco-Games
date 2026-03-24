@@ -5,6 +5,7 @@ import { authOptions } from "@/lib/auth";
 import { getSupabase } from "@/lib/supabase";
 import ConnectionStatus from "@/components/ConnectionStatus";
 import GameShowcase from "@/components/GameShowcase";
+import AboveBlocksShowcase from "@/components/AboveBlocksShowcase";
 
 export default async function Home() {
   const session = await getServerSession(authOptions);
@@ -117,6 +118,9 @@ export default async function Home() {
 
       {/* Featured Game */}
       <GameShowcase />
+
+      {/* Above Blocks */}
+      <AboveBlocksShowcase />
 
       {/* Leaderboards & Progress */}
       <section className="bg-coco-light py-10 sm:py-16 bg-stripes relative">
