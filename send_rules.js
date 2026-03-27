@@ -1,7 +1,7 @@
 const fs = require("fs");
 const path = require("path");
 
-const WEBHOOK_URL = "https://discord.com/api/webhooks/1484967146537877767/M_OWNU3j-Tl3ROtupT0thsQ7oe3WBL8Sh3KEgV-LaPgHuvOFPgKsUWhnhbpgTZF21zPN";
+const WEBHOOK_URL = "https://discord.com/api/webhooks/1487137715479777403/Pkds6INI0C5vfYKx_IHAdTgz8kjuWGKspP9M41iBmQd3L4RYrWQEiPJyoZroYGI0QX_T";
 
 async function sendRules() {
   const bannerPath = path.join(__dirname, "coco_games_banner.png");

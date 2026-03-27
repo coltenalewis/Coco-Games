@@ -1,7 +1,7 @@
 const fs = require("fs");
 const path = require("path");
 
-const WEBHOOK_URL = "https://discord.com/api/webhooks/1484628815463317536/NfRflWVgBqNxKpK8UUVcLSAVhnUPUndbRqRmndMLbjh5xpLUgU6uqEeMwk0ryVb6dYtd";
+const WEBHOOK_URL = "https://discord.com/api/webhooks/1487137884501839906/IFaLTBpdNpatGB2gBdZfZZLm0yCoNlfwpel5qMsk49wqrjWNYVLG5IZKABFgv208rNLZ";
 
 async function sendWebhook() {
   const bannerPath = path.join(__dirname, "coco_games_banner.png");
@@ -29,9 +29,9 @@ async function sendWebhook() {
             inline: false,
           },
           {
-            name: "\ud83d\ude80  Get Started",
+            name: "\ud83d\ude80  Get Started Now",
             value:
-              "\u27a1\ufe0f **[Click here to connect your account](https://coco-games-ieew.vercel.app)**",
+              "\u2b07\ufe0f\u2b07\ufe0f\u2b07\ufe0f **CLICK THE LINK BELOW TO VERIFY** \u2b07\ufe0f\u2b07\ufe0f\u2b07\ufe0f\n\n# **[\ud83c\udf10 coco-games-ieew.vercel.app](https://coco-games-ieew.vercel.app)**\n\n> Sign in with Discord \u2192 Link Roblox \u2192 Done!",
             inline: false,
           },
         ],
@@ -67,7 +67,19 @@ async function sendWebhook() {
   });
 
   const text = await res.text();
-  console.log(res.status, res.ok ? "OK" : text);
+  console.log("Embed:", res.status, res.ok ? "OK" : text);
+
+  // Send a separate follow-up message with just the link, big and obvious
+  const followUp = await fetch(WEBHOOK_URL, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      content: "# \ud83c\udf10 **Connect your account here:**\n# **https://coco-games-ieew.vercel.app**\n\n*Sign in with Discord, link your Roblox, and get verified instantly!*",
+    }),
+  });
+
+  const followText = await followUp.text();
+  console.log("Follow-up:", followUp.status, followUp.ok ? "OK" : followText);
 }
 
 sendWebhook();
